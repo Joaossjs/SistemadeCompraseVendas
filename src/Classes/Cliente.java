@@ -1,36 +1,77 @@
 package Classes;
 
-/**
- *
- * @author pczinho
- */
+
 public class Cliente {
     
-    private String codigo;
+    private int id;      //cl_id do banco de dados        
     private String nome;
     private String cep;
-    private String num;
+    private String numero;
     private String email;
-    private String tel;
+    private String telefone;
     
-    public Cliente (String codigo, String nome, String cep, String num, String email, String tel) {
-        this.codigo = codigo;
+    // Construtor completo
+    public Cliente(String nome, String cep, String numero, String email, String telefone) {
         this.nome = nome;
         this.cep = cep;
-        this.num = num;
+        this.numero = numero;
         this.email = email;
-        this.tel = tel;
+        this.telefone = telefone;
+}
+
+    
+    // Getters
+    public int getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCep() {
+        return cep;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getTelefone() {
+        return telefone;
     }
     
-    public String getCodigo() {return codigo;}
-    public String getNome() {return nome;}
-    public String getCep() {return cep;}
-    public String getNum() {return num;}
-    public String getEmail() {return email;}
-    public String getTel() {return tel;}
-    
+    // Setters (caso precise alterar dados)
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setCep(String cep) {
+        this.cep = cep;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
     @Override
     public String toString() {
-       return nome + "(Código: " + codigo +  ")";
+        return nome + " (Código: " + id + ")";
     }
 }

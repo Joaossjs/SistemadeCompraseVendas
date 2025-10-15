@@ -2,6 +2,7 @@ package Classes;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -10,38 +11,39 @@ public class NotaSaida {
     /**
      * Salva a nota de saída com seus itens e atualiza o estoque.
      */
-    public boolean salvarNotaEAtualizarEstoque(String codigoNota, String clienteId, String dataSql, List<ItemNotaNS> itens)
+    public int salvarNotaESubtrairEstoque(int clienteId, String dataSql, List<ItemNotaNS> itens)
             throws SQLException {
 
         Connection conexao = null;
-        String notasaIdGerado = null;
+        int notasIdGerado = -1;
 
         try {
             conexao = ConexaoSQL.getConexaoSQL();
-            conexao.setAutoCommit(false); // Inicia a transação
-            
-            // Salva o cabeçalho da nota de saída
-            notasaIdGerado = salvarCabecalho(conexao, codigoNota, clienteId, dataSql);
+            conexao.setAutoCommit(false);
 
-            if (notasaIdGerado == null) {
+            // Salva cabeçalho
+            notasIdGerado = salvarCabecalho(conexao, clienteId, dataSql);
+            if (notasIdGerado <= 0) {
                 conexao.rollback();
-                throw new SQLException("Falha ao salvar cabeçalho da nota de saída. O notasa_id pode já existir.");
+                throw new SQLException("Falha ao salvar cabeçalho da nota de saída.");
             }
 
-            // Salva os itens e atualiza o estoque (subtrai)
+            // Salva itens e subtrai estoque
             for (ItemNotaNS item : itens) {
-                // Passa notasaIdGerado como String
-                salvarItemEAtualizarEstoque(conexao, notasaIdGerado, item);
+                // Validação: não permitir retirar mais que o estoque
+                int estoqueAtual = pegarEstoque(conexao, item.getProdutoId());
+                if (item.getQuantidade() > estoqueAtual) {
+                    throw new SQLException("Não é possível vender " + item.getQuantidade()
+                            + " unidades do produto " + item.getNome() + ". Estoque atual: " + estoqueAtual);
+                }
+                salvarItemESubtrairEstoque(conexao, notasIdGerado, item);
             }
 
             conexao.commit();
-            System.out.println("Nota de Saída e Estoque atualizados com sucesso.");
-            return true;
+            return notasIdGerado;
 
         } catch (SQLException e) {
-            if (conexao != null) {
-                conexao.rollback();
-            }
+            if (conexao != null) conexao.rollback();
             throw e;
         } finally {
             if (conexao != null) {
@@ -51,88 +53,48 @@ public class NotaSaida {
         }
     }
 
-    /*
-     * Insere o cabeçalho da nota de saída.
-     */
-    private String salvarCabecalho(Connection conexao, String codigoNota, String clienteId, String dataSql)
-            throws SQLException {
-
-        // Tabela: notas_saida, ID da nota: notasa_id, ID do cliente: cli_id
-        String sql = "INSERT INTO notas_saida (notasa_id, cli_id, notasa_data) VALUES (?, ?, ?)";
-
-        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            
-            // notasa_id
-            pstmt.setString(1, codigoNota);
-            
-            // cli_id 
-            pstmt.setString(2, clienteId);
-            
-            // notasa_data
-            pstmt.setString(3, dataSql);
-
-            int linhasAfetadas = pstmt.executeUpdate();
-
-            if (linhasAfetadas > 0) {
-                return codigoNota;
+    private int salvarCabecalho(Connection conexao, int clienteId, String dataSql) throws SQLException {
+        String sql = "INSERT INTO notas_saida (cl_id, notasa_data) VALUES (?, ?)";
+        try (PreparedStatement ps = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, clienteId);
+            ps.setString(2, dataSql);
+            int linhas = ps.executeUpdate();
+            if (linhas > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) return rs.getInt(1);
+                }
             }
         }
-
-        return null;
+        return -1;
     }
 
-    /**
-     * Salva os itens da nota e atualiza o estoque de cada produto.
-     */
-    private void salvarItemEAtualizarEstoque(Connection conexao, String notasa_id, ItemNotaNS item)
-            throws SQLException {
-
-        // Insere o item
+    private void salvarItemESubtrairEstoque(Connection conexao, int notasId, ItemNotaNS item) throws SQLException {
         String sqlItem = "INSERT INTO itens_saida (notasa_id, prod_id, preco, quantidade) VALUES (?, ?, ?, ?)";
-
-        try (PreparedStatement pstmtItem = conexao.prepareStatement(sqlItem)) {
-            
-            // notasa_id
-            pstmtItem.setString(1, notasa_id);
-            
-            // prod_id
-            pstmtItem.setString(2, item.getProdutoId());
-            
-            // preco
-            pstmtItem.setDouble(3, item.getValorUnitario());
-            
-            // quantidade
-            pstmtItem.setInt(4, item.getQuantidade());
-            
-            pstmtItem.executeUpdate();
+        try (PreparedStatement ps = conexao.prepareStatement(sqlItem)) {
+            ps.setInt(1, notasId);
+            ps.setInt(2, item.getProdutoId());
+            ps.setDouble(3, item.getValorUnitario());
+            ps.setInt(4, item.getQuantidade());
+            ps.executeUpdate();
         }
 
-        // Atualiza o estoque
-        atualizarEstoque(conexao, item.getProdutoId(), item.getQuantidade(), false);
+        // Subtrai do estoque
+        String sqlAtualiza = "UPDATE produtos SET prod_quant = prod_quant - ? WHERE prod_id = ?";
+        try (PreparedStatement ps = conexao.prepareStatement(sqlAtualiza)) {
+            ps.setInt(1, item.getQuantidade());
+            ps.setInt(2, item.getProdutoId());
+            ps.executeUpdate();
+        }
     }
-    
-    /*
-     * Atualiza o estoque de um produto.
-     */
-    private void atualizarEstoque(Connection conexao, String prod_id, int prod_quant, boolean entrada)
-            throws SQLException {
 
-        String sql;
-        String nomeColunaQuant = "prod_quant";
-        String nomeTabelaProd = "produtos";
-
-        if (entrada) {
-            sql = "UPDATE " + nomeTabelaProd +
-                    " SET " + nomeColunaQuant + " = " + nomeColunaQuant + " + ? WHERE prod_id = ?";
-        } else {
-            sql = "UPDATE " + nomeTabelaProd +
-                    " SET " + nomeColunaQuant + " = " + nomeColunaQuant + " - ? WHERE prod_id = ?";
+    private int pegarEstoque(Connection conexao, int prodId) throws SQLException {
+        String sql = "SELECT prod_quant FROM produtos WHERE prod_id = ?";
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setInt(1, prodId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt("prod_quant");
+            }
         }
-
-        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setInt(1, prod_quant);
-            pstmt.setString(2, prod_id);
-            pstmt.executeUpdate();
-        }
+        return 0;
     }
 }

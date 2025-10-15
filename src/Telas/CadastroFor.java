@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -36,15 +37,6 @@ public class CadastroFor extends javax.swing.JFrame {
         }
         
         private boolean validarCampos() {
-        if (txtCodigofor.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, preencha o código do fornecedor!", 
-                "Campo obrigatório", 
-                JOptionPane.WARNING_MESSAGE);
-            txtCodigofor.requestFocus();
-            return false;
-        }
-        
         if (txtNomefor.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, 
                 "Por favor, preencha o nome do fornecedor!", 
@@ -115,17 +107,8 @@ public class CadastroFor extends javax.swing.JFrame {
     /* Verifica se o código já existe na lista de produtos
      * return true se já existe, false caso não exista
      */
-    private boolean codigoJaExiste(String codigo) {
-        for (Fornecedor p : fornecedores) {
-            if (p.getCodigo().equals(codigo)) {
-                return true;
-            }
-        }
-        return false;
-    }
     
-    private void limparCampos() {
-        txtCodigofor.setText("");
+    private void limparCampos() {;
         txtNomefor.setText("");
         txtNomefant.setText("");
         txtEmailfor.setText("");
@@ -133,7 +116,7 @@ public class CadastroFor extends javax.swing.JFrame {
         txtCepfor.setText("");
         txtTelfor.setText("");
         txtCNPJfor.setText("");
-        txtCodigofor.requestFocus();
+        txtNomefor.requestFocus();
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -153,10 +136,8 @@ public class CadastroFor extends javax.swing.JFrame {
         jPanel4 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
         txtNomefor = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        txtCodigofor = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         txtCNPJfor = new javax.swing.JTextField();
         jLabel14 = new javax.swing.JLabel();
@@ -255,9 +236,6 @@ public class CadastroFor extends javax.swing.JFrame {
 
         jPanel5.setOpaque(false);
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
-        jLabel4.setText("Código do fornecedor:");
-
         txtNomefor.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtNomefor.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(224, 224, 224), 2, true));
         txtNomefor.setPreferredSize(new java.awt.Dimension(5, 30));
@@ -269,20 +247,6 @@ public class CadastroFor extends javax.swing.JFrame {
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         jLabel5.setText("Nome:");
-
-        txtCodigofor.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        txtCodigofor.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(224, 224, 224), 2, true));
-        txtCodigofor.setPreferredSize(new java.awt.Dimension(5, 30));
-        txtCodigofor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtCodigoforActionPerformed(evt);
-            }
-        });
-        txtCodigofor.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtCodigoforKeyTyped(evt);
-            }
-        });
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         jLabel6.setText("Nome fantasia:");
@@ -319,23 +283,18 @@ public class CadastroFor extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(txtNomefor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(txtCNPJfor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(txtCodigofor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
                     .addComponent(jLabel5)
                     .addComponent(jLabel6)
                     .addComponent(jLabel14))
-                .addGap(0, 211, Short.MAX_VALUE))
+                .addGap(0, 256, Short.MAX_VALUE))
             .addComponent(txtNomefant, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCodigofor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addContainerGap()
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtNomefor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -346,7 +305,8 @@ public class CadastroFor extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel14)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCNPJfor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(txtCNPJfor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         jPanel6.setOpaque(false);
@@ -631,7 +591,7 @@ public class CadastroFor extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -641,10 +601,6 @@ public class CadastroFor extends javax.swing.JFrame {
     private void txtNomeforActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeforActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNomeforActionPerformed
-
-    private void txtCodigoforActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoforActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtCodigoforActionPerformed
 
     private void txtCNPJforActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCNPJforActionPerformed
         // TODO add your handling code here:
@@ -678,27 +634,25 @@ public class CadastroFor extends javax.swing.JFrame {
 
     private void saveforbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveforbTnActionPerformed
         try {
-            //Valida os campos antes de salvar
-            if (!validarCampos()) {
-            return;
-        }
-            //Pega os valores dos campos
-            String codigo = txtCodigofor.getText().trim();
-            String nome = txtNomefor.getText().trim();
-            String nomefant = txtNomefant.getText().trim();
-            String cep = txtCepfor.getText().trim();
-            String numero = txtNumfor.getText().trim();
-            String email = txtEmailfor.getText().trim();
-            String telefone = txtTelfor.getText().trim();
-            String cnpj = txtCNPJfor.getText().trim();
-            
-            System.out.println("String nome" + nome);
-       
-        String sql = "INSERT INTO fornecedores (for_nome, for_nomefant, for_cnpj, for_cep, for_numero, for_email, for_telefone, for_datacad) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conexao = ConexaoSQL.getConexaoSQL();
-            PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+        // Valida os campos antes de salvar
+        if (!validarCampos()) return;
 
-            //define os valores de '?'
+        // Pega os valores dos campos
+        String nome = txtNomefor.getText().trim();
+        String nomefant = txtNomefant.getText().trim();
+        String cep = txtCepfor.getText().trim();
+        String numero = txtNumfor.getText().trim();
+        String email = txtEmailfor.getText().trim();
+        String telefone = txtTelfor.getText().trim();
+        String cnpj = txtCNPJfor.getText().trim();
+
+        // SQL para inserir fornecedor
+        String sql = "INSERT INTO fornecedores (for_nome, for_nomefant, for_cnpj, for_cep, for_numero, for_email, for_telefone, for_data_cadastro) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conexao = ConexaoSQL.getConexaoSQL();
+             PreparedStatement pstmt = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
             pstmt.setString(1, nome);
             pstmt.setString(2, nomefant);
             pstmt.setString(3, cnpj);
@@ -706,52 +660,33 @@ public class CadastroFor extends javax.swing.JFrame {
             pstmt.setString(5, numero);
             pstmt.setString(6, email);
             pstmt.setString(7, telefone);
-            pstmt.setDate(8, new java.sql.Date(System.currentTimeMillis())); // data atual
+            pstmt.setTimestamp(8, new java.sql.Timestamp(System.currentTimeMillis())); // data atual
             pstmt.executeUpdate();
 
-            JOptionPane.showMessageDialog(this, "Fornecedor salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-
-
-        } catch (SQLException e) {
-            //mensagem de erro
-            JOptionPane.showMessageDialog(this, "Erro ao salvar o fornecedor no banco de dados.\n" + e.getMessage(), "Erro de Banco de Dados", JOptionPane.ERROR_MESSAGE);
-        }
-            
-            //Verifica se o codigo do fornecedor ja existe
-            if (codigoJaExiste(codigo)) {
-                JOptionPane.showMessageDialog(this,
-                        "Código já cadastrado! Tente outro.",
-                        "Código duplicado",
-                        JOptionPane.ERROR_MESSAGE);
-                txtCodigofor.requestFocus();
-                return;
+            // Pega o ID gerado pelo MySQL
+            ResultSet rs = pstmt.getGeneratedKeys();
+            int forId = 0;
+            if (rs.next()) {
+                forId = rs.getInt(1);
             }
-            //Cria o objeto Fornecedor
-            Fornecedor novoFornecedor = new Fornecedor(codigo, nome, nomefant, cep, numero, email, telefone, cnpj);
-            
-            //Salva o fornecedor na lista
+
+            // Cria o objeto Fornecedor com ID e adiciona à lista
+            Fornecedor novoFornecedor = new Fornecedor(forId, nome, nomefant, cep, numero, email, telefone, cnpj);
             fornecedores.add(novoFornecedor);
-            
-            //Mensagem de sucesso
-            JOptionPane.showMessageDialog(this,
-                "Fornecedor salvo com sucesso!",
-                "Sucesso",
-                JOptionPane.INFORMATION_MESSAGE);
-            
+
+            JOptionPane.showMessageDialog(this, "Fornecedor salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             limparCampos();
             
-            //Log de debug
-            System.out.println("Fornecedor cadastrado:  " + novoFornecedor);
-            System.out.println("Total de fornecedores: " + fornecedores.size());
-          
-          //Mensagem de erro
-        } catch (HeadlessException | NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Erro ao salvar o fornecedor: " + ex.getMessage(), 
-                "Erro", 
-                JOptionPane.ERROR_MESSAGE);
-           
+            TabelaFornecedores telaListagem = new TabelaFornecedores();
+            telaListagem.setVisible(true);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar o fornecedor no banco de dados.\n" + e.getMessage(), "Erro de Banco", JOptionPane.ERROR_MESSAGE);
         }
+
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Erro ao salvar o fornecedor: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_saveforbTnActionPerformed
 
     private void forcadbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forcadbTnActionPerformed
@@ -777,17 +712,13 @@ public class CadastroFor extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtTelforKeyTyped
 
-    private void txtCodigoforKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCodigoforKeyTyped
-        apenasNum(evt);
-    }//GEN-LAST:event_txtCodigoforKeyTyped
-
     private void txtNomefantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomefantActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNomefantActionPerformed
 
     private void txtCNPJforKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCNPJforKeyTyped
         char c = evt.getKeyChar();
-        if(!Character.isDigit(c) && c != '.' && c != '/' && c != java.awt.event.KeyEvent.VK_BACK_SPACE){
+        if(!Character.isDigit(c) && c != '.' && c != '/' && c != '-' && c != java.awt.event.KeyEvent.VK_BACK_SPACE){
             evt.consume();
         }
     }//GEN-LAST:event_txtCNPJforKeyTyped
@@ -832,7 +763,6 @@ public class CadastroFor extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -851,7 +781,6 @@ public class CadastroFor extends javax.swing.JFrame {
     private javax.swing.JButton saveforbTn;
     private javax.swing.JTextField txtCNPJfor;
     private javax.swing.JTextField txtCepfor;
-    private javax.swing.JTextField txtCodigofor;
     private javax.swing.JTextField txtEmailfor;
     private javax.swing.JTextField txtNomefant;
     private javax.swing.JTextField txtNomefor;

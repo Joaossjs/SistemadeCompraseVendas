@@ -5,6 +5,7 @@ import Classes.Produto;
 import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,77 +18,32 @@ import javax.swing.JOptionPane;
  */
 public class CadastroProd extends javax.swing.JFrame {
 
-    // Lista estática para guardar os produtos
     private static List<Produto> produtos = new ArrayList<>();
+    private TabelaProdutos tabelaProdutos; // referência para atualizar tabela em tempo real
 
     public static List<Produto> getProdutos() {
         return produtos;
     }
-    
+
     public CadastroProd() {
         initComponents();
-        filtroCodigoprod();
         this.setLocationRelativeTo(null);
     }
-    
-    //Configura o campo de código para aceitar apenas números
-    private void filtroCodigoprod() {
-        txtCodigoprod.addKeyListener(new java.awt.event.KeyAdapter() {
-            @Override
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                char c = evt.getKeyChar();
-                if (!Character.isDigit(c) && c != java.awt.event.KeyEvent.VK_BACK_SPACE) {
-                    evt.consume();
-                }
-            }
-        });
-    }
-    
-    /* Valida se todos os campos obrigatórios estão preenchidos
-     * return true se válido, false caso contrário
-     */
+
     private boolean validarCampos() {
-        if (txtCodigoprod.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, preencha o código do produto!", 
-                "Campo obrigatório", 
-                JOptionPane.WARNING_MESSAGE);
-            txtCodigoprod.requestFocus();
-            return false;
-        }
-        
         if (txtNomeprod.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, preencha o nome do produto!", 
-                "Campo obrigatório", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Preencha o nome do produto!", "Atenção", JOptionPane.WARNING_MESSAGE);
             txtNomeprod.requestFocus();
             return false;
         }
-        
         return true;
     }
 
-    
-    /* Verifica se o código já existe na lista de produtos
-     * return true se já existe, false caso não exista
-     */
-    private boolean codigoJaExiste(String codigo) {
-        for (Produto p : produtos) {
-            if (p.getId().equals(codigo)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //Limpa todos os campos do formulário
     private void limparCampos() {
-        txtCodigoprod.setText("");
         txtNomeprod.setText("");
         txtDescprod.setText("");
         spnQuantprod.setValue(0);
-        txtCodigoprod.requestFocus();
+        txtNomeprod.requestFocus();
     }
 
     @SuppressWarnings("unchecked")
@@ -98,8 +54,6 @@ public class CadastroProd extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        txtCodigoprod = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         txtNomeprod = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -143,22 +97,6 @@ public class CadastroProd extends javax.swing.JFrame {
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15), "", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), new java.awt.Color(240, 244, 248))); // NOI18N
-
-        jLabel6.setBackground(new java.awt.Color(51, 51, 51));
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel6.setText("Código do produto:");
-
-        txtCodigoprod.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        txtCodigoprod.setForeground(new java.awt.Color(31, 41, 55));
-        txtCodigoprod.setToolTipText("");
-        txtCodigoprod.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(203, 213, 224), 1, true));
-        txtCodigoprod.setMargin(new java.awt.Insets(5, 10, 5, 10));
-        txtCodigoprod.setVerifyInputWhenFocusTarget(false);
-        txtCodigoprod.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtCodigoprodActionPerformed(evt);
-            }
-        });
 
         jLabel2.setBackground(new java.awt.Color(51, 51, 51));
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
@@ -261,34 +199,31 @@ public class CadastroProd extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtCodigoprod)
-                    .addComponent(txtNomeprod)
-                    .addComponent(jScrollPane1)
-                    .addComponent(spnQuantprod)
-                    .addComponent(prodscadbTn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel5)
-                            .addComponent(saveprodbTn, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(158, 158, 158))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtNomeprod)
+                            .addComponent(jScrollPane1)
+                            .addComponent(spnQuantprod)
+                            .addComponent(prodscadbTn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel5)
+                                    .addComponent(saveprodbTn, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(158, 158, 158)))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(returnbTnprod, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(clearprodbTn, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel6)
-                .addGap(10, 10, 10)
-                .addComponent(txtCodigoprod, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addContainerGap()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtNomeprod, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -308,7 +243,7 @@ public class CadastroProd extends javax.swing.JFrame {
                 .addComponent(saveprodbTn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(prodscadbTn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -323,16 +258,12 @@ public class CadastroProd extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 498, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txtCodigoprodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoprodActionPerformed
-
-    }//GEN-LAST:event_txtCodigoprodActionPerformed
 
     private void returnbTnprodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnbTnprodActionPerformed
         Menu voltarmenu1 = new Menu();
@@ -341,8 +272,12 @@ public class CadastroProd extends javax.swing.JFrame {
     }//GEN-LAST:event_returnbTnprodActionPerformed
 
     private void prodscadbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prodscadbTnActionPerformed
-        TabelaProdutos telaListagem = new TabelaProdutos();
-        telaListagem.setVisible(true);
+        // Cria ou reutiliza a tabela de produtos
+    if (tabelaProdutos == null) {
+        tabelaProdutos = new TabelaProdutos(); 
+    }
+    tabelaProdutos.atualizarTabela(); // Atualiza os dados
+    tabelaProdutos.setVisible(true);   // mostra a janela
     }//GEN-LAST:event_prodscadbTnActionPerformed
 
     private void txtNomeprodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeprodActionPerformed
@@ -355,66 +290,51 @@ public class CadastroProd extends javax.swing.JFrame {
 
     private void saveprodbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveprodbTnActionPerformed
         try {
-            //Valida os campos antes de salvar
-            if (!validarCampos()) {
-            return;
-        }
-            //Pega os valores dos campos
-            String id = txtCodigoprod.getText().trim();
-            String nome = txtNomeprod.getText().trim();
-            String descricao = txtDescprod.getText().trim();
-            int quantidade = (int) spnQuantprod.getValue();
+        // Valida os campos
+        if (!validarCampos()) return;
 
-            
-            System.out.println("String nome" + nome);
-       
-        String sql = "INSERT INTO produtos (prod_nome, prod_desc, prod_quant, prod_datacad) VALUES (?, ?, ?, ?)";
+        String nome = txtNomeprod.getText().trim();
+        String descricao = txtDescprod.getText().trim();
+        int quantidade = (int) spnQuantprod.getValue();
+
+        String sql = "INSERT INTO produtos (prod_nome, prod_desc, prod_quant, prod_data) VALUES (?, ?, ?, ?)";
+        int idGerado = 0;
+
         try (Connection conexao = ConexaoSQL.getConexaoSQL();
-            PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+             PreparedStatement pstmt = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            //define os valores de '?'
             pstmt.setString(1, nome);
             pstmt.setString(2, descricao);
             pstmt.setInt(3, quantidade);
-            pstmt.setDate(4, new java.sql.Date(System.currentTimeMillis())); // data atual
+            pstmt.setTimestamp(4, new java.sql.Timestamp(System.currentTimeMillis()));
+
             pstmt.executeUpdate();
 
-            JOptionPane.showMessageDialog(this, "Produto salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-
-
-        } catch (SQLException e) {
-            //mensagem de erro
-            JOptionPane.showMessageDialog(this, "Erro ao salvar o produto no banco de dados.\n" + e.getMessage(), "Erro de Banco de Dados", JOptionPane.ERROR_MESSAGE);
-        }
-            
-            //Verifica se o codigo do produto ja existe
-            if (codigoJaExiste(id)) {
-                JOptionPane.showMessageDialog(this,
-                        "Código já cadastrado! Tente outro.",
-                        "Código duplicado",
-                        JOptionPane.ERROR_MESSAGE);
-                txtCodigoprod.requestFocus();
-                return;
+            // Pega o ID gerado pelo banco
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    idGerado = rs.getInt(1);
+                }
             }
-            //Cria o objeto Produto
-            Produto novoProduto = new Produto(id, nome, descricao, quantidade);
-            
-            //Salva o produto na lista
-            produtos.add(novoProduto);
-            
-            limparCampos();
-            
-            //Log de debug
-            System.out.println("Produto cadastrado:  " + novoProduto);
-            System.out.println("Total de produtos: " + produtos.size());
-          
-          //Mensagem de erro
-        } catch (HeadlessException | NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Erro ao salvar o produto: " + ex.getMessage(), 
-                "Erro", 
-                JOptionPane.ERROR_MESSAGE);
-        }       
+        }
+
+        // Cria o produto e adiciona à lista
+        Produto novoProduto = new Produto(idGerado, nome, descricao, quantidade);
+        produtos.add(novoProduto);
+
+        limparCampos();
+        JOptionPane.showMessageDialog(this, "Produto cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
+        // Abre a janela TabelaProdutos ou atualiza se já estiver aberta
+        if (tabelaProdutos == null) {
+            tabelaProdutos = new TabelaProdutos();
+        }
+        tabelaProdutos.atualizarTabela();
+        tabelaProdutos.setVisible(true);
+
+    } catch (HeadlessException | SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Erro ao salvar o produto: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+    }      
        
     }//GEN-LAST:event_saveprodbTnActionPerformed
 
@@ -448,7 +368,6 @@ public class CadastroProd extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -457,7 +376,6 @@ public class CadastroProd extends javax.swing.JFrame {
     private javax.swing.JButton returnbTnprod;
     private javax.swing.JButton saveprodbTn;
     private javax.swing.JSpinner spnQuantprod;
-    private javax.swing.JTextField txtCodigoprod;
     private javax.swing.JTextArea txtDescprod;
     private javax.swing.JTextField txtNomeprod;
     // End of variables declaration//GEN-END:variables

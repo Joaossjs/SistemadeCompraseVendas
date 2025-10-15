@@ -1,20 +1,58 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package Telas;
 
-/**
- *
- * @author pczinho
- */
+import Classes.ConexaoSQL;
+import Classes.ItemNotaNS;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+
 public class TabelaNotasSa extends javax.swing.JFrame {
 
-    /**
-     * Creates new form TabelaNotasSa
-     */
     public TabelaNotasSa() {
         initComponents();
+        carregarNotas();
+    }
+
+    /**
+     * Carrega todas as notas de saída e itens do banco de dados
+     */
+    private void carregarNotas() {
+        List<ItemNotaNS> listaItens = new ArrayList<>();
+
+        String sql = "SELECT ns.notasa_id, ns.notasa_data, c.cl_nome, p.prod_nome, i.preco, i.quantidade "
+                   + "FROM notas_saida ns "
+                   + "JOIN itens_saida i ON ns.notasa_id = i.notasa_id "
+                   + "JOIN clientes c ON ns.cl_id = c.cl_id "
+                   + "JOIN produtos p ON i.prod_id = p.prod_id "
+                   + "ORDER BY ns.notasa_id";
+
+        try (Connection conn = ConexaoSQL.getConexaoSQL();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            DefaultTableModel model = (DefaultTableModel) tableNS.getModel();
+            model.setRowCount(0);
+
+            while (rs.next()) {
+                int idNota = rs.getInt("notasa_id");
+                String data = rs.getString("notasa_data");
+                String cliente = rs.getString("cl_nome");
+                String produto = rs.getString("prod_nome");
+                double precoUnit = rs.getDouble("preco");
+                int quantidade = rs.getInt("quantidade");
+                double total = precoUnit * quantidade;
+
+                model.addRow(new Object[]{
+                    idNota, data, cliente, produto, precoUnit, quantidade, total
+                });
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -26,21 +64,102 @@ public class TabelaNotasSa extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel2 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tableNS = new javax.swing.JTable();
+        returnNEbTn = new javax.swing.JButton();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jPanel2.setBackground(new java.awt.Color(239, 68, 68));
+        jPanel2.setBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\pczinho\\Downloads\\JAVAprojeto\\JAVAprojeto\\src\\icons\\icone_saida.png")); // NOI18N
+        jLabel2.setText("Lançamento de Notas de Saída");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        tableNS.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Id", "Data", "Cliente", "Produto", "Preço Unit.", "Quantidade", "Total"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Double.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tableNS);
+
+        returnNEbTn.setBackground(new java.awt.Color(107, 114, 128));
+        returnNEbTn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        returnNEbTn.setForeground(new java.awt.Color(255, 255, 255));
+        returnNEbTn.setText("Voltar");
+        returnNEbTn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                returnNEbTnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(returnNEbTn, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 577, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 366, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(returnNEbTn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 8, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void returnNEbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnNEbTnActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_returnNEbTnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -78,5 +197,10 @@ public class TabelaNotasSa extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton returnNEbTn;
+    private javax.swing.JTable tableNS;
     // End of variables declaration//GEN-END:variables
 }

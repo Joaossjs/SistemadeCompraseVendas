@@ -1,7 +1,12 @@
 package Telas;
 
-
+import Classes.ConexaoSQL;
 import Classes.Fornecedor;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
@@ -9,34 +14,54 @@ public class TabelaFornecedores extends javax.swing.JFrame {
 
     public TabelaFornecedores() {
         initComponents();
-
         preencherTabela();
         setLocationRelativeTo(null); 
     }
 
     private void preencherTabela() {
-        // Pega o modelo da tabela, linhas e colunas
-        DefaultTableModel modelo = (DefaultTableModel) tabelaCl.getModel();
-        
-        // Limpa a tabela  e remove as linhas vazias
+        DefaultTableModel modelo = (DefaultTableModel) tabelaFor.getModel();
         modelo.setRowCount(0);
 
-        // Pega a lista de produtos da outra tela
-        List<Fornecedor> listaDeFornecedores = CadastroFor.getFornecedores();
-        
-        // Percorre a lista e adiciona cada produto como uma nova linha na tabela
-        for (Fornecedor p : listaDeFornecedores) {
-            modelo.addRow(new Object[]{
-                p.getCodigo(),
-                p.getNome(),
-                p.getNomefant(),
-                p.getCep(),
-                p.getNum(),
-                p.getEmail(),
-                p.getTel()
-            });
+        String sql = "SELECT ne.notae_id, ne.notae_data, f.for_nome, p.prod_nome, ie.preco, ie.quantidade "
+           + "FROM notas_entrada ne "
+           + "JOIN fornecedores f ON ne.for_id = f.for_id "
+           + "JOIN itens_entrada ie ON ne.notae_id = ie.notae_id "
+           + "JOIN produtos p ON ie.prod_id = p.prod_id "
+           + "ORDER BY ne.notae_id DESC";
+
+        try (Connection conexao = ConexaoSQL.getConexaoSQL();
+             PreparedStatement stmt = conexao.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            SimpleDateFormat formatoData = new SimpleDateFormat("dd/MM/yyyy");
+
+            while (rs.next()) {
+                int fornecedorId = rs.getInt("for_id");
+                String data = formatoData.format(rs.getDate("for_data"));
+                String fornecedor = rs.getString("for_nome");
+                String produto = rs.getString("prod_nome");
+                double preco = rs.getDouble("preco");
+                int quantidade = rs.getInt("quantidade");
+                double subtotal = preco * quantidade;
+
+                modelo.addRow(new Object[]{
+                    fornecedorId,
+                    data,
+                    fornecedor,
+                    produto,
+                    preco,      
+                    quantidade,
+                    subtotal    
+});
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -48,14 +73,14 @@ public class TabelaFornecedores extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        tabelaCl = new javax.swing.JTable();
+        tabelaFor = new javax.swing.JTable();
         returnForbTn = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        tabelaCl.setModel(new javax.swing.table.DefaultTableModel(
+        tabelaFor.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
@@ -63,7 +88,7 @@ public class TabelaFornecedores extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Código", "Nome", "Nome F", "CEP", "Número", "Email", "Telefone"
+                "Id", "Nome", "Nome F", "CEP", "Número", "Email", "Telefone"
             }
         ) {
             Class[] types = new Class [] {
@@ -74,7 +99,7 @@ public class TabelaFornecedores extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tabelaCl);
+        jScrollPane1.setViewportView(tabelaFor);
 
         returnForbTn.setBackground(new java.awt.Color(107, 114, 128));
         returnForbTn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -144,7 +169,6 @@ public class TabelaFornecedores extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void returnForbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnForbTnActionPerformed
-
         this.dispose();
     }//GEN-LAST:event_returnForbTnActionPerformed
 
@@ -189,6 +213,6 @@ public class TabelaFornecedores extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton returnForbTn;
-    private javax.swing.JTable tabelaCl;
+    private javax.swing.JTable tabelaFor;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,20 +1,99 @@
 package Telas;
 
 import Classes.ComboItem;
+import Classes.ConexaoSQL;
+import Classes.ItemNotaNE;
+import Classes.ItemNotaNS;
+import Classes.NotaSaida;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author pczinho
  */
 public class NotasSa extends javax.swing.JFrame {
+    
+    private final List<ItemNotaNS> listaItensNota = new ArrayList<>();
 
     /**
      * Creates new form NotasSa
      */
     public NotasSa() {
         initComponents();
+        preencherTabela();
+        carregarClientes();
+        carregarProdutos();
     }
+    
+    // Preenche a tabela com os itens da lista estática
+    private void preencherTabela() {
+        DefaultTableModel modelo = (DefaultTableModel) tblProdsNS.getModel();
+        modelo.setRowCount(0);
 
+        for (ItemNotaNS item : listaItensNota) {
+            modelo.addRow(new Object[]{
+                item.getProdutoId(),
+                item.getNome(),
+                item.getQuantidade(),
+                String.format("R$ %.2f", item.getValorUnitario())
+            });
+        }
+    }
+    
+    private void carregarClientes() {
+        String sql = "SELECT cl_id, cl_nome FROM clientes ORDER BY cl_nome";
+
+        try (Connection conexao = ConexaoSQL.getConexaoSQL();
+             PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            cmbClNS.removeAllItems();
+            cmbClNS.addItem(new ComboItem("", "Selecione o fornecedor..."));
+
+            while (rs.next()) {
+                String id = rs.getString("cl_id");
+                String nome = rs.getString("cl_nome");
+                ComboItem item = new ComboItem(id, id + " - " + nome);
+                cmbClNS.addItem(item);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erro ao carregar clientes: " + e.getMessage(),
+                    "Erro de Banco de Dados",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void carregarProdutos() {
+        String sql = "SELECT prod_id, prod_nome FROM produtos ORDER BY prod_nome";
+
+        try (Connection conexao = ConexaoSQL.getConexaoSQL();
+             PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            cmbProdNS.removeAllItems();
+            cmbProdNS.addItem(new ComboItem("", "Selecione o produto..."));
+
+            while (rs.next()) {
+                String id = rs.getString("prod_id");
+                String nome = rs.getString("prod_nome");
+                ComboItem item = new ComboItem(id, nome);
+                cmbProdNS.addItem(item);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erro ao carregar produtos: " + e.getMessage(),
+                    "Erro de Banco de Dados",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -28,8 +107,6 @@ public class NotasSa extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        txtIdNS = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         cmbClNS = new javax.swing.JComboBox<>();
         jLabel6 = new javax.swing.JLabel();
@@ -44,6 +121,7 @@ public class NotasSa extends javax.swing.JFrame {
         saveNSbTn = new javax.swing.JButton();
         NSscadbTn = new javax.swing.JButton();
         txtPrecoNS = new javax.swing.JFormattedTextField();
+        AddprodNS = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblProdsNS = new javax.swing.JTable();
         jLabel10 = new javax.swing.JLabel();
@@ -79,23 +157,6 @@ public class NotasSa extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         jPanel5.setOpaque(false);
-
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
-        jLabel4.setText("Código da nota:");
-
-        txtIdNS.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        txtIdNS.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(224, 224, 224), 2, true));
-        txtIdNS.setPreferredSize(new java.awt.Dimension(5, 30));
-        txtIdNS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtIdNSActionPerformed(evt);
-            }
-        });
-        txtIdNS.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtIdNSKeyTyped(evt);
-            }
-        });
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         jLabel5.setText("Valor unitário:");
@@ -199,66 +260,70 @@ public class NotasSa extends javax.swing.JFrame {
             }
         });
 
+        AddprodNS.setBackground(new java.awt.Color(107, 114, 128));
+        AddprodNS.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        AddprodNS.setForeground(new java.awt.Color(255, 255, 255));
+        AddprodNS.setText("Adicionar Produto");
+        AddprodNS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AddprodNSActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(txtIdNS, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(spnDateNS)
             .addComponent(cmbClNS, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(cmbProdNS, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(spnQuantNE)
             .addComponent(NSscadbTn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(txtPrecoNS)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addComponent(jLabel4)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(saveNSbTn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(returnbTnNS, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(clearbTnNS, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel9)
+                    .addComponent(jLabel7)
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(saveNSbTn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(returnbTnNS, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE))
+                        .addComponent(cmbProdNS, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(clearbTnNS, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel7))
-                        .addGap(0, 229, Short.MAX_VALUE)))
-                .addContainerGap())
-            .addComponent(txtPrecoNS)
+                        .addComponent(AddprodNS, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtIdNS, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addContainerGap()
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(spnDateNS, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPrecoNS, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(13, 13, 13)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmbClNS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbProdNS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbProdNS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(AddprodNS))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(spnQuantNE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(18, 18, Short.MAX_VALUE)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(returnbTnNS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(clearbTnNS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -275,14 +340,15 @@ public class NotasSa extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 75, Short.MAX_VALUE)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(85, Short.MAX_VALUE)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tblProdsNS.setModel(new javax.swing.table.DefaultTableModel(
@@ -293,9 +359,17 @@ public class NotasSa extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Id", "Nome", "Quantidade", "Preço Unit."
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(tblProdsNS);
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
@@ -319,7 +393,7 @@ public class NotasSa extends javax.swing.JFrame {
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(473, Short.MAX_VALUE)))
+                    .addContainerGap(434, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -328,8 +402,8 @@ public class NotasSa extends javax.swing.JFrame {
                 .addGap(13, 13, 13)
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 139, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 459, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 34, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
@@ -339,14 +413,6 @@ public class NotasSa extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txtIdNSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdNSActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtIdNSActionPerformed
-
-    private void txtIdNSKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIdNSKeyTyped
-
-    }//GEN-LAST:event_txtIdNSKeyTyped
 
     private void cmbClNSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbClNSActionPerformed
         // TODO add your handling code here:
@@ -363,11 +429,41 @@ public class NotasSa extends javax.swing.JFrame {
     }//GEN-LAST:event_returnbTnNSActionPerformed
 
     private void clearbTnNSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearbTnNSActionPerformed
-
+        listaItensNota.clear();
+        ((DefaultTableModel) tblProdsNS.getModel()).setRowCount(0);
+        cmbClNS.setSelectedIndex(0);
+        cmbProdNS.setSelectedIndex(0);
+        spnQuantNE.setValue(1);
+        txtPrecoNS.setText("");
     }//GEN-LAST:event_clearbTnNSActionPerformed
 
     private void saveNSbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveNSbTnActionPerformed
-        
+    if (listaItensNota.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Adicione pelo menos um produto antes de salvar a nota.");
+            return;
+        }
+
+        if (cmbClNS.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this, "Selecione um cliente!");
+            return;
+        }
+
+        ComboItem clienteSelecionado = (ComboItem) cmbClNS.getSelectedItem();
+        int clienteId = Integer.parseInt(clienteSelecionado.getId());
+
+        String dataVenda = new java.text.SimpleDateFormat("yyyy-MM-dd").format(spnDateNS.getValue());
+
+        try {
+            NotaSaida notaDAO = new NotaSaida();
+            int notasaId = notaDAO.salvarNotaESubtrairEstoque(clienteId, dataVenda, listaItensNota);
+
+            if (notasaId > 0) {
+                JOptionPane.showMessageDialog(this, "Nota salva com sucesso!");
+                clearbTnNSActionPerformed(evt); // Limpa todos os campos e tabela
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar nota: " + e.getMessage());
+        }
     }//GEN-LAST:event_saveNSbTnActionPerformed
 
     private void NSscadbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NSscadbTnActionPerformed
@@ -382,6 +478,60 @@ public class NotasSa extends javax.swing.JFrame {
     private void txtPrecoNSKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrecoNSKeyTyped
 
     }//GEN-LAST:event_txtPrecoNSKeyTyped
+
+    private void AddprodNSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddprodNSActionPerformed
+    if (cmbProdNS.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this, "Selecione um produto válido!");
+            return;
+        }
+
+        ComboItem itemSelecionado = (ComboItem) cmbProdNS.getSelectedItem();
+        int produtoId = Integer.parseInt(itemSelecionado.getId());
+        String nomeProduto = itemSelecionado.toString();
+
+        int quantidade = (Integer) spnQuantNE.getValue();
+
+        String precoStr = txtPrecoNS.getText().trim().replace(',', '.');
+        if (precoStr.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Informe o preço unitário!");
+            return;
+        }
+
+        double precoUnit;
+        try {
+            precoUnit = Double.parseDouble(precoStr);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Preço inválido!");
+            return;
+        }
+
+        if (quantidade <= 0 || precoUnit <= 0) {
+            JOptionPane.showMessageDialog(this, "Quantidade e preço devem ser maiores que zero.");
+            return;
+        }
+
+        // Verifica duplicidade
+        for (ItemNotaNS item : listaItensNota) {
+            if (item.getProdutoId() == produtoId) {
+                JOptionPane.showMessageDialog(this, "Produto já adicionado.");
+                return;
+            }
+        }
+
+        // Adiciona à lista
+        ItemNotaNS item = new ItemNotaNS(produtoId, nomeProduto, quantidade, precoUnit);
+        listaItensNota.add(item);
+
+        // Atualiza tabela
+        DefaultTableModel model = (DefaultTableModel) tblProdsNS.getModel();
+        model.addRow(new Object[]{produtoId, nomeProduto, quantidade, precoUnit});
+
+        // Limpa campos do produto
+        cmbProdNS.setSelectedIndex(0);
+        spnQuantNE.setValue(1);
+        txtPrecoNS.setText("");
+        
+    }//GEN-LAST:event_AddprodNSActionPerformed
 
     /**
      * @param args the command line arguments
@@ -417,13 +567,13 @@ public class NotasSa extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton AddprodNS;
     private javax.swing.JButton NSscadbTn;
     private javax.swing.JButton clearbTnNS;
     private javax.swing.JComboBox<ComboItem> cmbClNS;
     private javax.swing.JComboBox<ComboItem> cmbProdNS;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -438,7 +588,6 @@ public class NotasSa extends javax.swing.JFrame {
     private javax.swing.JSpinner spnDateNS;
     private javax.swing.JSpinner spnQuantNE;
     private javax.swing.JTable tblProdsNS;
-    private javax.swing.JTextField txtIdNS;
     private javax.swing.JFormattedTextField txtPrecoNS;
     // End of variables declaration//GEN-END:variables
 }

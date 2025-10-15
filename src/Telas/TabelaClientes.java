@@ -1,7 +1,7 @@
 package Telas;
 
-
 import Classes.Cliente;
+import Telas.CadastroCl;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
@@ -9,30 +9,31 @@ public class TabelaClientes extends javax.swing.JFrame {
 
     public TabelaClientes() {
         initComponents();
-
         preencherTabela();
         setLocationRelativeTo(null); 
     }
 
-    private void preencherTabela() {
-        // Pega o modelo da tabela, linhas e colunas
+    /**
+     * Preenche a tabela com os clientes cadastrados na lista de CadastroCl
+     */
+    public void preencherTabela() {
         DefaultTableModel modelo = (DefaultTableModel) tabelaCl.getModel();
         
-        // Limpa a tabela  e remove as linhas vazias
+        // Limpa a tabela antes de preencher
         modelo.setRowCount(0);
 
-        // Pega a lista de produtos da outra tela
-        List<Cliente> listaDeFornecedores = CadastroCl.getClientes();
+        // Pega a lista de clientes cadastrados
+        List<Cliente> listaDeClientes = CadastroCl.getClientes();
         
-        // Percorre a lista e adiciona cada produto como uma nova linha na tabela
-        for (Cliente p : listaDeFornecedores) {
+        // Adiciona cada cliente como uma linha na tabela
+        for (Cliente c : listaDeClientes) {
             modelo.addRow(new Object[]{
-                p.getCodigo(),
-                p.getNome(),
-                p.getCep(),
-                p.getNum(),
-                p.getEmail(),
-                p.getTel()
+                c.getId(),        // id do cliente
+                c.getNome(),      // nome
+                c.getCep(),       // cep
+                c.getNumero(),    // número
+                c.getEmail(),     // email
+                c.getTelefone()   // telefone
             });
         }
     }
@@ -141,7 +142,6 @@ public class TabelaClientes extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void returnClbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_returnClbTnActionPerformed
-
         this.dispose();
     }//GEN-LAST:event_returnClbTnActionPerformed
 

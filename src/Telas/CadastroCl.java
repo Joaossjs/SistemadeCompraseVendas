@@ -5,6 +5,7 @@ import Classes.ConexaoSQL;
 import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,103 +17,82 @@ import javax.swing.JOptionPane;
  */
 public class CadastroCl extends javax.swing.JFrame {
 
-    // Lista estática para guardar os fornecedores
+    // Lista estática para manter clientes em memória (opcional)
     private static List<Cliente> clientes = new ArrayList<>();
 
     public static List<Cliente> getClientes() {
         return clientes;
     }
+
     public CadastroCl() {
         initComponents();
         this.setLocationRelativeTo(null);
-        
     }
 
-        private void apenasNum(java.awt.event.KeyEvent evt) {
-            char c = evt.getKeyChar();
-            if (!Character.isDigit(c) && c != java.awt.event.KeyEvent.VK_BACK_SPACE) {
-                evt.consume();
-            }
+    private void apenasNum(java.awt.event.KeyEvent evt) {
+        char c = evt.getKeyChar();
+        if (!Character.isDigit(c) && c != java.awt.event.KeyEvent.VK_BACK_SPACE) {
+            evt.consume();
         }
-        
-        private boolean validarCampos() {
-        if (txtCodigocl.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, preencha o código do cliente!", 
-                "Campo obrigatório", 
-                JOptionPane.WARNING_MESSAGE);
-            txtCodigocl.requestFocus();
-            return false;
-        }
-        
+    }
+
+    private boolean validarCampos() {
+        // Não validar txtCodigocl: cl_id é gerado pelo banco
         if (txtNomecl.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, preencha o nome do cliente!", 
-                "Campo obrigatório", 
+            JOptionPane.showMessageDialog(this,
+                "Por favor, preencha o nome do cliente!",
+                "Campo obrigatório",
                 JOptionPane.WARNING_MESSAGE);
             txtNomecl.requestFocus();
             return false;
         }
-        
+
         if (txtCepcl.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, informe o CEP do cliente!", 
-                "Campo obrigatório", 
+            JOptionPane.showMessageDialog(this,
+                "Por favor, informe o CEP do cliente!",
+                "Campo obrigatório",
                 JOptionPane.WARNING_MESSAGE);
             txtCepcl.requestFocus();
             return false;
         }
-        
+
         if (txtNumcl.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, informe o número do endereço!", 
-                "Campo obrigatório", 
+            JOptionPane.showMessageDialog(this,
+                "Por favor, informe o número do endereço!",
+                "Campo obrigatório",
                 JOptionPane.WARNING_MESSAGE);
             txtNumcl.requestFocus();
             return false;
         }
-        
+
         if (txtEmailcl.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, informe o email do cliente!", 
-                "Campo obrigatório", 
+            JOptionPane.showMessageDialog(this,
+                "Por favor, informe o email do cliente!",
+                "Campo obrigatório",
                 JOptionPane.WARNING_MESSAGE);
             txtEmailcl.requestFocus();
             return false;
         }
-        
+
         if (txtTelcl.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "Por favor, informe o telefone do cliente!", 
-                "Campo obrigatório", 
+            JOptionPane.showMessageDialog(this,
+                "Por favor, informe o telefone do cliente!",
+                "Campo obrigatório",
                 JOptionPane.WARNING_MESSAGE);
             txtTelcl.requestFocus();
             return false;
         }
+
         return true;
     }
 
-    
-    /* Verifica se o código já existe na lista de clientes
-     * return true se já existe, false caso não exista
-     */
-    private boolean codigoJaExiste(String codigo) {
-        for (Cliente p : clientes) {
-            if (p.getCodigo().equals(codigo)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
     private void limparCampos() {
-        txtCodigocl.setText("");
         txtNomecl.setText("");
         txtEmailcl.setText("");
         txtNumcl.setText("");
         txtCepcl.setText("");
         txtTelcl.setText("");
-        txtCodigocl.requestFocus();
+        txtNomecl.requestFocus();
     }
 
     /**
@@ -128,10 +108,8 @@ public class CadastroCl extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
         txtNomecl = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        txtCodigocl = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         txtNumcl = new javax.swing.JTextField();
@@ -174,7 +152,7 @@ public class CadastroCl extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap(241, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addContainerGap(241, Short.MAX_VALUE))
+                .addContainerGap(242, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -191,9 +169,6 @@ public class CadastroCl extends javax.swing.JFrame {
 
         jPanel5.setOpaque(false);
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
-        jLabel4.setText("Código do cliente:");
-
         txtNomecl.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtNomecl.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(224, 224, 224), 2, true));
         txtNomecl.setPreferredSize(new java.awt.Dimension(5, 30));
@@ -206,43 +181,23 @@ public class CadastroCl extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         jLabel5.setText("Nome:");
 
-        txtCodigocl.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        txtCodigocl.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(224, 224, 224), 2, true));
-        txtCodigocl.setPreferredSize(new java.awt.Dimension(5, 30));
-        txtCodigocl.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtCodigoclActionPerformed(evt);
-            }
-        });
-        txtCodigocl.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtCodigoclKeyTyped(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(txtNomecl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5))
-                .addGap(0, 211, Short.MAX_VALUE))
-            .addComponent(txtCodigocl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel5)
+                .addGap(0, 283, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCodigocl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addContainerGap()
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtNomecl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(78, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel6.setOpaque(false);
@@ -285,13 +240,13 @@ public class CadastroCl extends javax.swing.JFrame {
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(txtNumcl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(txtCepcl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
                     .addComponent(jLabel8))
                 .addGap(0, 296, Short.MAX_VALUE))
+            .addComponent(txtNumcl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -499,25 +454,25 @@ public class CadastroCl extends javax.swing.JFrame {
                         .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(28, 28, 28)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(saveclbTn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(returnbTncl, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(clearclbTn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(clcadbTn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap())))
+                            .addComponent(clcadbTn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(saveclbTn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap(132, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel10, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -547,17 +502,16 @@ public class CadastroCl extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 784, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(528, Short.MAX_VALUE))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -576,68 +530,68 @@ public class CadastroCl extends javax.swing.JFrame {
 
     private void saveclbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveclbTnActionPerformed
         try {
-            //Valida os campos antes de salvar
-            if (!validarCampos()) {
-                return;
+        // Valida os campos antes de salvar
+        if (!validarCampos()) return;
+
+        // Pega os valores dos campos
+        String nome = txtNomecl.getText().trim();
+        String cep = txtCepcl.getText().trim();
+        String numero = txtNumcl.getText().trim();
+        String email = txtEmailcl.getText().trim();
+        String telefone = txtTelcl.getText().trim();
+
+        // Cria o SQL de INSERT (cl_id é AUTO_INCREMENT, não precisamos passar)
+        String sql = "INSERT INTO clientes (cl_nome, cl_cep, cl_numero, cl_email, cl_telefone, cl_data_cadastro) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        try (Connection conexao = ConexaoSQL.getConexaoSQL();
+             PreparedStatement pstmt = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            pstmt.setString(1, nome);
+            pstmt.setString(2, cep);
+            pstmt.setString(3, numero);
+            pstmt.setString(4, email);
+            pstmt.setString(5, telefone);
+            pstmt.setTimestamp(6, new java.sql.Timestamp(System.currentTimeMillis())); // data atual
+            pstmt.executeUpdate();
+
+            // Pega o ID gerado automaticamente pelo banco
+            int idGerado = 0;
+            ResultSet rs = null;
+            try {
+                rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                idGerado = rs.getInt(1);
             }
-            //Pega os valores dos campos
-            String codigo = txtCodigocl.getText().trim();
-            String nome = txtNomecl.getText().trim();
-            String cep = txtCepcl.getText().trim();
-            String numero = txtNumcl.getText().trim();
-            String email = txtEmailcl.getText().trim();
-            String telefone = txtTelcl.getText().trim();
+        } finally {
+            if (rs != null) rs.close();
+    }
 
-            System.out.println("String nome" + nome);
+            // Cria o cliente com o ID gerado
+            Cliente novoCliente = new Cliente(nome, cep, numero, email, telefone);
+            novoCliente.setId(idGerado);
 
-            String sql = "INSERT INTO clientes (cl_nome, cl_cep, cl_numero, cl_email, cl_telefone, cl_datacad) VALUES (?, ?, ?, ?, ?, ?)";
-            try (Connection conexao = ConexaoSQL.getConexaoSQL();
-                PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-
-                //define os valores de '?'
-                pstmt.setString(1, nome);
-                pstmt.setString(2, cep);
-                pstmt.setString(3, numero);
-                pstmt.setString(4, email);
-                pstmt.setString(5, telefone);
-                pstmt.setDate(6, new java.sql.Date(System.currentTimeMillis())); // data atual
-                pstmt.executeUpdate();
-
-                JOptionPane.showMessageDialog(this, "Cliente salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-
-            } catch (SQLException e) {
-                //mensagem de erro
-                JOptionPane.showMessageDialog(this, "Erro ao salvar o cliente no banco de dados.\n" + e.getMessage(), "Erro de Banco de Dados", JOptionPane.ERROR_MESSAGE);
-            }
-
-            //Verifica se o codigo do cliente ja existe
-            if (codigoJaExiste(codigo)) {
-                JOptionPane.showMessageDialog(this,
-                    "Código já cadastrado! Tente outro.",
-                    "Código duplicado",
-                    JOptionPane.ERROR_MESSAGE);
-                txtCodigocl.requestFocus();
-                return;
-            }
-            //Cria o objeto Cliente
-            Cliente novoCliente = new Cliente(codigo, nome, cep, numero, email, telefone);
-
-            //Salva o cliente na lista
+            // Adiciona na lista local
             clientes.add(novoCliente);
 
             limparCampos();
 
-            //Log de debug
-            System.out.println("Cliente cadastrado:  " + novoCliente);
-            System.out.println("Total de clientes: " + clientes.size());
+            JOptionPane.showMessageDialog(this, "Cliente salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 
-            //Mensagem de erro
-        } catch (HeadlessException | NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this,
-                "Erro ao salvar o cliente:" + ex.getMessage(),
-                "Erro",
-                JOptionPane.ERROR_MESSAGE);
+            // Log de debug
+            System.out.println("Cliente cadastrado: " + novoCliente);
+            System.out.println("Total de clientes: " + clientes.size());
+            
+            TabelaClientes telaListagem = new TabelaClientes();
+            telaListagem.setVisible(true);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar o cliente no banco.\n" + e.getMessage(), "Erro de Banco", JOptionPane.ERROR_MESSAGE);
         }
+
+    } catch (HeadlessException ex) {
+        JOptionPane.showMessageDialog(this, "Erro ao salvar o cliente: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+    }
+
     }//GEN-LAST:event_saveclbTnActionPerformed
 
     private void clearclbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearclbTnActionPerformed
@@ -677,14 +631,6 @@ public class CadastroCl extends javax.swing.JFrame {
     private void txtNumclActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumclActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNumclActionPerformed
-
-    private void txtCodigoclKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCodigoclKeyTyped
-        apenasNum(evt);
-    }//GEN-LAST:event_txtCodigoclKeyTyped
-
-    private void txtCodigoclActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoclActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtCodigoclActionPerformed
 
     private void txtNomeclActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeclActionPerformed
         // TODO add your handling code here:
@@ -733,7 +679,6 @@ public class CadastroCl extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -749,7 +694,6 @@ public class CadastroCl extends javax.swing.JFrame {
     private javax.swing.JButton returnbTncl;
     private javax.swing.JButton saveclbTn;
     private javax.swing.JTextField txtCepcl;
-    private javax.swing.JTextField txtCodigocl;
     private javax.swing.JTextField txtEmailcl;
     private javax.swing.JTextField txtNomecl;
     private javax.swing.JTextField txtNumcl;

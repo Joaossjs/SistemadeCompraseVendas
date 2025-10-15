@@ -4,206 +4,103 @@ import Classes.ComboItem;
 import Classes.ConexaoSQL;
 import Classes.ItemNotaNE;
 import Classes.NotaEntrada;
-import java.text.SimpleDateFormat;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.NumberFormat;
-import javax.swing.JOptionPane;
-import javax.swing.text.NumberFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-
-/**
- *
- * @author pczinho
- */
 public class NotasEn extends javax.swing.JFrame {
+
+    private final NotaEntrada notaDAO = new NotaEntrada();
+    private static final List<ItemNotaNE> listaItensNota = new ArrayList<>();
 
     public static List<ItemNotaNE> getItemNotaNE() {
         return listaItensNota;
     }
 
-    private final NotaEntrada notaDAO = new NotaEntrada(); 
-    private static List<ItemNotaNE> listaItensNota = new ArrayList<>();
-
-        public NotasEn() {
-        initComponents(); 
-        formatadorMoeda();
+    public NotasEn() {
+        initComponents();
         setLocationRelativeTo(null);
         carregarFornecedores();
         carregarProdutos();
         preencherTabela();
-
-        spnQuantNE.setValue(0);
+        spnQuantNE.setValue(1);
     }
-        
+
     // Preenche a tabela com os itens da lista estática
     private void preencherTabela() {
+        DefaultTableModel modelo = (DefaultTableModel) tblProdsNE.getModel();
+        modelo.setRowCount(0);
 
-    DefaultTableModel modelo = (DefaultTableModel) tblProdsNE.getModel();
-    
-    // Limpa a tabela
-    modelo.setRowCount(0);
-    
-    // Verifica se está vazia
-    if (listaItensNota.isEmpty()) {
-        System.out.println("Nenhum item na lista");
-        return;
+        for (ItemNotaNE item : listaItensNota) {
+            modelo.addRow(new Object[]{
+                item.getProdutoId(),
+                item.getNome(),
+                item.getQuantidade(),
+                String.format("R$ %.2f", item.getValorUnitario())
+            });
+        }
     }
-    
-    // Percorre e adiciona na tabela
-    for (ItemNotaNE item : listaItensNota) {
-        
-        modelo.addRow(new Object[]{
-            item.getProdutoId(),
-            item.getNome(),
-            item.getQuantidade(),
-            "R$ " + String.format("%.2f", item.getValorUnitario()),
-        });
-    }
- 
-}
-        
-        
+
     private void carregarFornecedores() {
         String sql = "SELECT for_id, for_nome FROM fornecedores ORDER BY for_nome";
-        
+
         try (Connection conexao = ConexaoSQL.getConexaoSQL();
-         PreparedStatement pstmt = conexao.prepareStatement(sql);
-         ResultSet rs = pstmt.executeQuery()) {
-            
-            // Limpa e adiciona o item padrão
+             PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
             cmbForNE.removeAllItems();
-            cmbForNE.addItem(new ComboItem("", "Selecione o fornecedor...")); 
-            
+            cmbForNE.addItem(new ComboItem("", "Selecione o fornecedor..."));
+
             while (rs.next()) {
-            String id = rs.getString("for_id");
-            String nome = rs.getString("for_nome");
-            
-            //Passar o ID (int) e o texto formatado (String)
-            String textoFormatado = id + " - " + nome;
-            ComboItem item = new ComboItem(id, textoFormatado); //Passa o ID e o Texto
-            
-            cmbForNE.addItem(item);
-        }
-            
+                String id = rs.getString("for_id");
+                String nome = rs.getString("for_nome");
+                ComboItem item = new ComboItem(id, id + " - " + nome);
+                cmbForNE.addItem(item);
+            }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao carregar fornecedores: " + e.getMessage(), "Erro de Banco de Dados", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Erro ao carregar fornecedores: " + e.getMessage(),
+                    "Erro de Banco de Dados",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
-private void carregarProdutos() {
+    private void carregarProdutos() {
+        String sql = "SELECT prod_id, prod_nome FROM produtos ORDER BY prod_nome";
 
-    String sql = "SELECT prod_id, prod_nome FROM produtos ORDER BY prod_nome";
+        try (Connection conexao = ConexaoSQL.getConexaoSQL();
+             PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
 
-    try (Connection conexao = ConexaoSQL.getConexaoSQL();
-         PreparedStatement pstmt = conexao.prepareStatement(sql);
-         ResultSet rs = pstmt.executeQuery()) {
+            cmbProdNE.removeAllItems();
+            cmbProdNE.addItem(new ComboItem("", "Selecione o produto..."));
 
-        //Limpa e adiciona o item padrão
-        cmbProdNE.removeAllItems();
-        cmbProdNE.addItem(new ComboItem("", "Selecione o produto...")); //Construtor (int, String)
-
-        while (rs.next()) {
-
-            String id = rs.getString("prod_id");
-            String nome = rs.getString("prod_nome");
-
-
-            String textoFormatado = id + " - " + nome;
-            ComboItem item = new ComboItem(id, textoFormatado); //Passa o ID e o TEXTO
-
-            cmbProdNE.addItem(item);
+            while (rs.next()) {
+                String id = rs.getString("prod_id");
+                String nome = rs.getString("prod_nome");
+                ComboItem item = new ComboItem(id, nome);
+                cmbProdNE.addItem(item);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erro ao carregar produtos: " + e.getMessage(),
+                    "Erro de Banco de Dados",
+                    JOptionPane.ERROR_MESSAGE);
         }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Erro ao carregar produtos: " + e.getMessage(), "Erro de Banco de Dados", JOptionPane.ERROR_MESSAGE);
     }
-}
-
-    private void formatadorMoeda() {
-        NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(new java.util.Locale("pt", "BR"));
-        NumberFormatter formatadorMoeda = new NumberFormatter(formatoMoeda);
-        formatadorMoeda.setValueClass(Double.class);
-        formatadorMoeda.setMinimum(0.0);
-        formatadorMoeda.setAllowsInvalid(false);
-
-        txtPrecoNE.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(formatadorMoeda));
-        txtPrecoNE.setValue(0.0);  
-    }
-    
-    private boolean validarNota() {
-    //Valida se há pelo menos um produto cadastrado na nota   
-    if (listaItensNota.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Adicione pelo menos um produto antes de salvar.", "Erro de validação", JOptionPane.WARNING_MESSAGE);
-        return false;
-    }
-    
-    //Caso tenha pelo menos um produto cadastrado, é feito o pedido de confirmação para poder salvar a nota
-    if (spnDateNE.getValue() == null || cmbForNE.getSelectedIndex() == 0) {
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Os campos de Código, Data ou Fornecedor estão vazios. Deseja salvar a nota assim?", 
-            "Confirmação de Salvamento", 
-            JOptionPane.YES_NO_OPTION, 
-            JOptionPane.QUESTION_MESSAGE);
-        
-        return (confirm == JOptionPane.YES_OPTION);
-    }   
-    
-
-return true; // Todos os campos estão válidos
-
-}
-    
-    
 
     private void limparCampos() {
-        spnDateNE.setValue(new java.util.Date()); // Data atual
+        spnDateNE.setValue(new java.util.Date());
         cmbForNE.setSelectedIndex(0);
         cmbProdNE.setSelectedIndex(0);
-        spnQuantNE.setValue(1); // Volta para o valor inicial
+        spnQuantNE.setValue(1);
         txtPrecoNE.setValue(0.0);
     }
-    
-    private void adicionarProdutoNaTabela() {
-    if (cmbProdNE.getSelectedIndex() <= 0) {
-        JOptionPane.showMessageDialog(this, "Selecione um produto válido!");
-        return;
-    }
-
-    ComboItem itemSelecionado = (ComboItem) cmbProdNE.getSelectedItem();
-    String produtoId = itemSelecionado.getId();
-    String nomeProduto = itemSelecionado.toString();
-    int quantidade = ((Number) spnQuantNE.getValue()).intValue();
-    double valorUnitario = ((Number) txtPrecoNE.getValue()).doubleValue();
-
-    // Verifica se produto já foi adicionado
-    DefaultTableModel modelo = (DefaultTableModel) tblProdsNE.getModel();
-    for (int i = 0; i < modelo.getRowCount(); i++) {
-        if (modelo.getValueAt(i, 0).toString().equals(produtoId)) {
-            JOptionPane.showMessageDialog(this, "Produto já adicionado à tabela!");
-            return;
-        }
-    }
-
-    // Adiciona à tabela
-    modelo.addRow(new Object[]{
-        produtoId,
-        nomeProduto,
-        quantidade,
-        valorUnitario
-    });
-
-    // Limpa os campos
-    cmbProdNE.setSelectedIndex(0);
-    spnQuantNE.setValue(1);
-    txtPrecoNE.setValue(0.0);
-}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -219,7 +116,6 @@ return true; // Todos os campos estão válidos
         jPanel5 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         cmbForNE = new javax.swing.JComboBox<>();
-        jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         spnDateNE = new javax.swing.JSpinner();
         jLabel8 = new javax.swing.JLabel();
@@ -231,9 +127,7 @@ return true; // Todos os campos estão válidos
         saveNEbTn = new javax.swing.JButton();
         NEscadbTn = new javax.swing.JButton();
         txtPrecoNE = new javax.swing.JFormattedTextField();
-        clearbTnNE1 = new javax.swing.JButton();
         AddprodNE = new javax.swing.JButton();
-        txtIdNE = new javax.swing.JFormattedTextField();
         jLabel10 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -277,9 +171,6 @@ return true; // Todos os campos estão válidos
                 cmbForNEActionPerformed(evt);
             }
         });
-
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
-        jLabel6.setText("Código da nota:");
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         jLabel7.setText("Produto:");
@@ -377,20 +268,6 @@ return true; // Todos os campos estão válidos
             }
         });
 
-        clearbTnNE1.setBackground(new java.awt.Color(139, 92, 246));
-        clearbTnNE1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        clearbTnNE1.setForeground(new java.awt.Color(255, 255, 255));
-        clearbTnNE1.setText("Produtos Adicionados");
-        clearbTnNE1.setBorderPainted(false);
-        clearbTnNE1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        clearbTnNE1.setFocusPainted(false);
-        clearbTnNE1.setPreferredSize(new java.awt.Dimension(50, 40));
-        clearbTnNE1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                clearbTnNE1ActionPerformed(evt);
-            }
-        });
-
         AddprodNE.setBackground(new java.awt.Color(107, 114, 128));
         AddprodNE.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         AddprodNE.setForeground(new java.awt.Color(255, 255, 255));
@@ -398,22 +275,6 @@ return true; // Todos os campos estão válidos
         AddprodNE.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 AddprodNEActionPerformed(evt);
-            }
-        });
-
-        txtIdNE.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(203, 213, 224), 1, true));
-        txtIdNE.setForeground(new java.awt.Color(31, 41, 55));
-        txtIdNE.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
-        txtIdNE.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        txtIdNE.setMargin(new java.awt.Insets(5, 10, 5, 10));
-        txtIdNE.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtIdNEActionPerformed(evt);
-            }
-        });
-        txtIdNE.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtIdNEKeyTyped(evt);
             }
         });
 
@@ -425,34 +286,31 @@ return true; // Todos os campos estão válidos
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(spnQuantNE, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(NEscadbTn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                        .addComponent(saveNEbTn, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(clearbTnNE1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(returnbTnNE, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(clearbTnNE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(cmbProdNE, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(AddprodNE, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE))
-                    .addComponent(cmbForNE, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(spnDateNE)
                     .addComponent(txtPrecoNE)
-                    .addComponent(txtIdNE)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(cmbProdNE, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(AddprodNE, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(returnbTnNE, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(clearbTnNE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(spnQuantNE)
+                    .addComponent(cmbForNE, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(NEscadbTn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel10))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel9)
+                                    .addComponent(jLabel7)
+                                    .addComponent(jLabel8)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel10)))
+                            .addComponent(saveNEbTn, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -460,10 +318,6 @@ return true; // Todos os campos estão válidos
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtIdNE, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(spnDateNE, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -490,9 +344,7 @@ return true; // Todos os campos estão válidos
                     .addComponent(returnbTnNE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(clearbTnNE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(saveNEbTn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(clearbTnNE1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(saveNEbTn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(NEscadbTn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -509,7 +361,7 @@ return true; // Todos os campos estão válidos
                 {null, null, null, null}
             },
             new String [] {
-                "Código", "Nome", "Quantidade", "Preço Unitário"
+                "Id", "Nome", "Quantidade", "Preço Unitário"
             }
         ));
         jScrollPane1.setViewportView(tblProdsNE);
@@ -520,14 +372,14 @@ return true; // Todos os campos estão válidos
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 584, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(19, 19, 19)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 495, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(220, 220, 220)
+                        .addGap(193, 193, 193)
                         .addComponent(jLabel1)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -540,7 +392,7 @@ return true; // Todos os campos estão válidos
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 451, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 464, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -569,147 +421,53 @@ return true; // Todos os campos estão válidos
     }//GEN-LAST:event_clearbTnNEActionPerformed
 
     private void saveNEbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveNEbTnActionPerformed
-    // Pegando dados da tabela
-    DefaultTableModel model = (DefaultTableModel) tblProdsNE.getModel();
-
-    if (tblProdsNE.getModel().getRowCount() == 0) {
+    // Validação de itens
+    if (listaItensNota.isEmpty()) {
         JOptionPane.showMessageDialog(this, "Adicione pelo menos um produto antes de salvar a nota.");
         return;
     }
 
-    String codigoNota = txtIdNE.getText().trim();
-    if (codigoNota.isEmpty()) {
-         JOptionPane.showMessageDialog(this, "O Código da Nota é obrigatório.");
-         txtIdNE.requestFocus();
-         return;
-    }
-
-    // Coleta e validação do Fornecedor
+    // Validação do fornecedor
     ComboItem fornecedorSelecionado = (ComboItem) cmbForNE.getSelectedItem();
-    String fornecedorId = (fornecedorSelecionado != null && !fornecedorSelecionado.getId().isEmpty())
-                          ? fornecedorSelecionado.getId()
-                          : null;
-                          
-    if (fornecedorId == null || cmbForNE.getSelectedIndex() <= 0) {
+    if (fornecedorSelecionado == null || fornecedorSelecionado.getId().isEmpty()) {
         JOptionPane.showMessageDialog(this, "Selecione um fornecedor válido.");
         return;
     }
-   
-    // Coleta da Data
-    Date dataSelecionada = (Date) spnDateNE.getValue();
-    java.sql.Date dataSQL = (dataSelecionada != null) ? new java.sql.Date(dataSelecionada.getTime()) : null;
+    int fornecedorId = Integer.parseInt(fornecedorSelecionado.getId());
+    String fornecedorNome = fornecedorSelecionado.getLabel(); 
 
-    Connection conexao = null;
-    String novaNotaId = null;
+    // Formatação da data
+    String dataSql = new java.text.SimpleDateFormat("yyyy-MM-dd")
+                                 .format(spnDateNE.getValue());
 
     try {
-        conexao = ConexaoSQL.getConexaoSQL();
-        conexao.setAutoCommit(false); // Transação
+        // Salva a nota no banco e atualiza estoque
+        int notaeIdGerado = notaDAO.salvarNotaEAtualizarEstoque(fornecedorId, dataSql, listaItensNota);
 
-        // --- Insere cabeçalho da nota ---
-        // A SQL deve incluir notae_id, e for_id e notae_id são VARCHAR
-        String sqlNota = "INSERT INTO notas_entrada (notae_id, for_id, notae_data) VALUES (?, ?, ?)";
-        
-        try (PreparedStatement psNota = conexao.prepareStatement(sqlNota)) {
+        if (notaeIdGerado > 0) {
+            JOptionPane.showMessageDialog(this, "Nota salva e estoque atualizado com sucesso!");
 
-            // notae_id
-            psNota.setString(1, codigoNota); 
-            
-            // for_id
-            psNota.setString(2, fornecedorId); 
-            
-            // notae_data
-            if (dataSQL == null) {
-                 psNota.setNull(3, java.sql.Types.DATE);
-            } else {
-                 psNota.setDate(3, dataSQL);
-            }
+            // Limpa a tabela e campos da tela
+            DefaultTableModel model = (DefaultTableModel) tblProdsNE.getModel();
+            model.setRowCount(0);
+            listaItensNota.clear();
+            limparCampos();
 
-            psNota.executeUpdate();
+            TabelaNotasEn telaNotas = new TabelaNotasEn(); // Aqui não precisa passar itens
+            telaNotas.setVisible(true);
 
-            // O ID da nota agora é o código fornecido
-            novaNotaId = codigoNota; 
         }
 
-        //Insere os itens
-        String sqlProduto = "INSERT INTO itens_entrada (notae_id, prod_id, quantidade, preco) VALUES (?, ?, ?, ?)";
-        // SQL para Atualizar o Estoque (Adicionar quantidade)
-        String sqlEstoque = "UPDATE produtos SET prod_quant = prod_quant + ? WHERE prod_id = ?";
-        
-        try (PreparedStatement psProd = conexao.prepareStatement(sqlProduto);
-             PreparedStatement psEstoque = conexao.prepareStatement(sqlEstoque)) { // PreparedStatement para o estoque
-
-            for (int i = 0; i < model.getRowCount(); i++) {
-    
-            // Coleta os dados do Item
-            Object prodIdObj = model.getValueAt(i, 0);
-            //TRATAMENTO E VALIDAÇÃO DE PROD_ID
-                if (prodIdObj == null || prodIdObj.toString().trim().isEmpty()) {
-                // Se o código do produto estiver nulo ou vazio
-                throw new IllegalArgumentException("O Código do Produto (coluna 1) não pode estar vazio na linha " + (i + 1) + " da tabela.");
-            }
-    
-            String prodId = prodIdObj.toString();
-
-    // Coleta dos demais dados  
-    String qtdString = model.getValueAt(i, 2).toString();
-    String precoString = model.getValueAt(i, 3).toString().replace("R$", "").replace(",", ".").trim();
-    
-    int qtd = Integer.parseInt(qtdString);
-    double preco = Double.parseDouble(precoString);
-                
-                // notae_id
-                psProd.setString(1, novaNotaId); 
-                
-                // prod_id
-                psProd.setString(2, prodId);
-                
-                // quantidade
-                psProd.setInt(3, qtd);
-                
-                // preco
-                psProd.setDouble(4, preco);
-
-                psProd.executeUpdate();
-                
-                // quantidade
-                psEstoque.setInt(1, qtd);
-                
-                // prod_id
-                psEstoque.setString(2, prodId);
-                
-                psEstoque.executeUpdate(); // Executa a atualização do estoque
-            }
-        }
-
-
-        conexao.commit(); // Confirma transação
-        JOptionPane.showMessageDialog(this, "Nota de entrada salva com sucesso!");
-
-        // Limpa tabela e formulário
-        model.setRowCount(0);
-        limparCampos();
-        
-    } catch (Exception e) {
-        try {
-            if (conexao != null) conexao.rollback();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        JOptionPane.showMessageDialog(this, "Erro ao salvar a nota: " + e.getMessage(), "Erro de Transação", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        try {
-            if (conexao != null) conexao.setAutoCommit(true);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-}
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Erro ao salvar nota: " + ex.getMessage(),
+                "Erro de Persistência", JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();
+    }
     }//GEN-LAST:event_saveNEbTnActionPerformed
 
     private void NEscadbTnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NEscadbTnActionPerformed
-        TabelaNotasEn telaListagem = new TabelaNotasEn();
-        telaListagem.setVisible(true);
-        this.dispose();
+        TabelaNotasEn tabelaNotas = new TabelaNotasEn();
+        tabelaNotas.setVisible(true);
     }//GEN-LAST:event_NEscadbTnActionPerformed
 
     private void txtPrecoNEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPrecoNEActionPerformed
@@ -718,17 +476,79 @@ return true; // Todos os campos estão válidos
 
     private void txtPrecoNEKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrecoNEKeyTyped
         char c = evt.getKeyChar();
-        if(!Character.isDigit(c) && c != '-' && c != java.awt.event.KeyEvent.VK_BACK_SPACE){
+        if(!Character.isDigit(c) && c != ',' && c != java.awt.event.KeyEvent.VK_BACK_SPACE){
             evt.consume();
         }
     }//GEN-LAST:event_txtPrecoNEKeyTyped
 
-    private void clearbTnNE1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearbTnNE1ActionPerformed
-        limparCampos();
-    }//GEN-LAST:event_clearbTnNE1ActionPerformed
-
     private void AddprodNEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddprodNEActionPerformed
-        adicionarProdutoNaTabela();
+    // Validação de seleção de produto
+    if (cmbProdNE.getSelectedIndex() <= 0) {
+        JOptionPane.showMessageDialog(this, "Selecione um produto válido!");
+        return;
+    }
+
+    // Obtém dados do produto selecionado
+    ComboItem itemSelecionado = (ComboItem) cmbProdNE.getSelectedItem();
+    int produtoId = Integer.parseInt(itemSelecionado.getId()); // ID como INT
+    String nomeProduto = itemSelecionado.getLabel();
+
+    // Quantidade e preço unitário
+    int quantidade;
+    double precoUnit;
+
+    try {
+        quantidade = (Integer) spnQuantNE.getValue();
+
+        String precoStr = txtPrecoNE.getText().trim();
+        if (precoStr.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "O campo de preço unitário não pode estar vazio.");
+            return;
+        }
+        precoStr = precoStr.replace(',', '.');
+        precoUnit = Double.parseDouble(precoStr);
+
+    } catch (NumberFormatException | ClassCastException e) {
+        JOptionPane.showMessageDialog(this, "Erro ao obter quantidade ou preço.");
+        return;
+    }
+
+    if (quantidade <= 0 || precoUnit <= 0) {
+        JOptionPane.showMessageDialog(this, "Quantidade e preço devem ser maiores que zero.");
+        return;
+    }
+
+    // Verifica duplicação na tabela
+    DefaultTableModel model = (DefaultTableModel) tblProdsNE.getModel();
+    boolean existe = false;
+    for (int i = 0; i < model.getRowCount(); i++) {
+        if ((int) model.getValueAt(i, 0) == produtoId) {
+            existe = true;
+            break;
+        }
+    }
+
+    if (!existe) {
+        // Cria item e adiciona na lista
+        ItemNotaNE item = new ItemNotaNE(produtoId, nomeProduto, quantidade, precoUnit);
+        listaItensNota.add(item);
+
+        // Adiciona na tabela
+        model.addRow(new Object[]{
+            item.getProdutoId(),
+            item.getNome(),
+            item.getQuantidade(),
+            String.format("%.2f", item.getValorUnitario())
+        });
+    } else {
+        JOptionPane.showMessageDialog(this, "Produto já adicionado na lista.");
+    }
+
+    // Limpa campos de entrada
+    cmbProdNE.setSelectedIndex(0);
+    spnQuantNE.setValue(1);
+    txtPrecoNE.setText("");
+
     }//GEN-LAST:event_AddprodNEActionPerformed
 
     private void spnQuantNEKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_spnQuantNEKeyTyped
@@ -737,14 +557,6 @@ return true; // Todos os campos estão válidos
             evt.consume();
         }
     }//GEN-LAST:event_spnQuantNEKeyTyped
-
-    private void txtIdNEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdNEActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtIdNEActionPerformed
-
-    private void txtIdNEKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIdNEKeyTyped
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtIdNEKeyTyped
 
     /**
      * @param args the command line arguments
@@ -781,14 +593,12 @@ return true; // Todos os campos estão válidos
     private javax.swing.JButton AddprodNE;
     private javax.swing.JButton NEscadbTn;
     private javax.swing.JButton clearbTnNE;
-    private javax.swing.JButton clearbTnNE1;
     private javax.swing.JComboBox<ComboItem> cmbForNE;
     private javax.swing.JComboBox<ComboItem> cmbProdNE;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -800,7 +610,6 @@ return true; // Todos os campos estão válidos
     private javax.swing.JSpinner spnDateNE;
     private javax.swing.JSpinner spnQuantNE;
     private javax.swing.JTable tblProdsNE;
-    private javax.swing.JFormattedTextField txtIdNE;
     private javax.swing.JFormattedTextField txtPrecoNE;
     // End of variables declaration//GEN-END:variables
 }

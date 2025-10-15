@@ -1,65 +1,60 @@
 package Telas;
 
-import Classes.ItemNotaNE;
+import Classes.ConexaoSQL;
+import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author pczinho
- */
 public class TabelaNotasEn extends javax.swing.JFrame {
-    
+
     public TabelaNotasEn() {
         initComponents();
         setLocationRelativeTo(null);
         preencherTabela();
     }
-    
-    // Preenche a tabela com os itens da lista estática
-    void preencherTabela() {
-        DefaultTableModel modelo = (DefaultTableModel) tableNE.getModel();
 
-        // Limpa a tabela antes de preencher
+    private void preencherTabela() {
+        DefaultTableModel modelo = (DefaultTableModel) tableNE.getModel();
         modelo.setRowCount(0);
 
-        // Obtém a lista estática de itens (vinda da tela NotasEn)
-        List<ItemNotaNE> listaItens = NotasEn.getItemNotaNE();
+        String sql = "SELECT ne.notae_id, ne.notae_data, f.for_nome, p.prod_nome, ie.preco, ie.quantidade "
+           + "FROM notas_entrada ne "
+           + "JOIN fornecedores f ON ne.for_id = f.for_id "
+           + "JOIN itens_entrada ie ON ne.notae_id = ie.notae_id "
+           + "JOIN produtos p ON ie.prod_id = p.prod_id "
+           + "ORDER BY ne.notae_id DESC";
 
-        if (listaItens == null || listaItens.isEmpty()) {
-            System.out.println("Nenhum item encontrado na lista de notas.");
-            return;
+        try (Connection conexao = ConexaoSQL.getConexaoSQL();
+             PreparedStatement stmt = conexao.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            SimpleDateFormat formatoData = new SimpleDateFormat("dd/MM/yyyy");
+
+            while (rs.next()) {
+                int notaId = rs.getInt("notae_id");
+                String data = formatoData.format(rs.getDate("notae_data"));
+                String fornecedor = rs.getString("for_nome");
+                String produto = rs.getString("prod_nome");
+                double preco = rs.getDouble("preco");
+                int quantidade = rs.getInt("quantidade");
+                double subtotal = preco * quantidade;
+
+                modelo.addRow(new Object[]{
+                    notaId,
+                    data,
+                    fornecedor,
+                    produto,
+                    preco,      
+                    quantidade,
+                    subtotal    
+});
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        // Data atual formatada (caso não haja outra data associada)
-        String dataAtual = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date());
-        double valorTotalGeral = 0.0;
-
-        // Percorre a lista e adiciona cada item à tabela
-        for (ItemNotaNE item : listaItens) {
-
-            // Calcula subtotal de cada item (quantidade * valor unitário)
-            double subtotal = item.getQuantidade() * item.getValorUnitario();
-            valorTotalGeral += subtotal;
-
-            modelo.addRow(new Object[]{
-                item.getProdutoId(),                        // Id
-                dataAtual,                                  // Data
-                item.getFornecedorNome(),                   // Fornecedor
-                item.getNome(),                             // Produto
-                String.format("R$ %.2f", item.getValorUnitario()), // Preço Unitário formatado
-                item.getQuantidade(),                       // Quantidade
-                String.format("R$ %.2f", subtotal)          // Total formatado
-            });
-        }
-
-        System.out.println("Tabela preenchida com " + listaItens.size() + " itens.");
-        System.out.println("Valor total geral: R$ " + String.format("%.2f", valorTotalGeral));
     }
-    /**
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -143,10 +138,10 @@ public class TabelaNotasEn extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(returnNEbTn, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -154,8 +149,8 @@ public class TabelaNotasEn extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 379, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(returnNEbTn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -195,10 +190,8 @@ public class TabelaNotasEn extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TabelaNotasEn().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new TabelaNotasEn().setVisible(true);
         });
     }
 

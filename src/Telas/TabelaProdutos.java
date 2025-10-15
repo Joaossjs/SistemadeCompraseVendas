@@ -1,30 +1,29 @@
 package Telas;
 
-
 import Classes.Produto;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 public class TabelaProdutos extends javax.swing.JFrame {
 
+    // Construtor padrão
     public TabelaProdutos() {
         initComponents();
-
-        preencherTabela();
         setLocationRelativeTo(null); 
+        atualizarTabela();
     }
 
-    private void preencherTabela() {
-        // Pega o modelo da Tabela, linhas e colunas
+    /**
+     * Atualiza a tabela com os produtos cadastrados
+     */
+    public void atualizarTabela() {
         DefaultTableModel modelo = (DefaultTableModel) tabelaProd.getModel();
-        
-        // Limpa a tabela  e remove as linhas vazias
-        modelo.setRowCount(0);
+        modelo.setRowCount(0); // limpa a tabela
 
-        // Pega a lista de produtos da outra tela
+        // Pega a lista de produtos da classe CadastroProd
         List<Produto> listaDeProdutos = CadastroProd.getProdutos();
-        
-        // Percorre a lista e adiciona cada produto como uma nova linha na tabela
+
+        // Adiciona cada produto como uma linha na tabela
         for (Produto p : listaDeProdutos) {
             modelo.addRow(new Object[]{
                 p.getId(),
