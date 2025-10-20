@@ -7,14 +7,14 @@ public class Produto {
     private String descricao;
     private int quantidade;
 
-    // Construtor sem id (para inserir no banco)
+    // Construtor sem id para inserir no banco
     public Produto(String nome, String descricao, int quantidade) {
         this.nome = nome;
         this.descricao = descricao;
         this.quantidade = quantidade;
     }
 
-    // Construtor completo (para criar a partir do banco)
+    // Construtor completo para criar a partir do banco
     public Produto(int id, String nome, String descricao, int quantidade) {
         this.id = id;
         this.nome = nome;
@@ -35,7 +35,7 @@ public class Produto {
     public int getQuantidade() { return quantidade; }
     public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
 
-    @Override
+    @Override // Exibir o produto com código e nome
     public String toString() {
         return nome + " (Código: " + id + ")";
     }

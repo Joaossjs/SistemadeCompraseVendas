@@ -141,7 +141,7 @@ public class NotasEn extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\pczinho\\Downloads\\JAVAprojeto\\JAVAprojeto\\src\\icons\\icone_entrada.png")); // NOI18N
+        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\2830482411041\\Downloads\\Javaprojeto\\SistemadeCompraseVendas\\src\\icons\\icone_entrada.png")); // NOI18N
         jLabel2.setText("Lançamento de Notas de Entrada");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -201,7 +201,7 @@ public class NotasEn extends javax.swing.JFrame {
         returnbTnNE.setForeground(new java.awt.Color(255, 255, 255));
         returnbTnNE.setText("Voltar");
         returnbTnNE.setBorderPainted(false);
-        returnbTnNE.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        returnbTnNE.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         returnbTnNE.setFocusPainted(false);
         returnbTnNE.setPreferredSize(new java.awt.Dimension(50, 40));
         returnbTnNE.addActionListener(new java.awt.event.ActionListener() {
@@ -215,7 +215,7 @@ public class NotasEn extends javax.swing.JFrame {
         clearbTnNE.setForeground(new java.awt.Color(255, 255, 255));
         clearbTnNE.setText("Limpar");
         clearbTnNE.setBorderPainted(false);
-        clearbTnNE.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        clearbTnNE.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         clearbTnNE.setFocusPainted(false);
         clearbTnNE.setPreferredSize(new java.awt.Dimension(50, 40));
         clearbTnNE.addActionListener(new java.awt.event.ActionListener() {
@@ -229,7 +229,7 @@ public class NotasEn extends javax.swing.JFrame {
         saveNEbTn.setForeground(new java.awt.Color(255, 255, 255));
         saveNEbTn.setText("Salvar Nota");
         saveNEbTn.setBorderPainted(false);
-        saveNEbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        saveNEbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         saveNEbTn.setFocusPainted(false);
         saveNEbTn.setPreferredSize(new java.awt.Dimension(50, 40));
         saveNEbTn.addActionListener(new java.awt.event.ActionListener() {
@@ -243,7 +243,7 @@ public class NotasEn extends javax.swing.JFrame {
         NEscadbTn.setForeground(new java.awt.Color(255, 255, 255));
         NEscadbTn.setText("Notas Cadastradas");
         NEscadbTn.setBorderPainted(false);
-        NEscadbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        NEscadbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         NEscadbTn.setFocusPainted(false);
         NEscadbTn.setPreferredSize(new java.awt.Dimension(50, 40));
         NEscadbTn.addActionListener(new java.awt.event.ActionListener() {

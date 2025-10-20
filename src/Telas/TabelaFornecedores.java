@@ -1,12 +1,7 @@
 package Telas;
 
-import Classes.ConexaoSQL;
 import Classes.Fornecedor;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import Classes.Fornecedor;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
@@ -18,46 +13,30 @@ public class TabelaFornecedores extends javax.swing.JFrame {
         setLocationRelativeTo(null); 
     }
 
-    private void preencherTabela() {
+    /**
+     * Preenche a tabela com os clientes cadastrados na lista de CadastroCl
+     */
+    public void preencherTabela() {
         DefaultTableModel modelo = (DefaultTableModel) tabelaFor.getModel();
+        
+        // Limpa a tabela antes de preencher
         modelo.setRowCount(0);
 
-        String sql = "SELECT ne.notae_id, ne.notae_data, f.for_nome, p.prod_nome, ie.preco, ie.quantidade "
-           + "FROM notas_entrada ne "
-           + "JOIN fornecedores f ON ne.for_id = f.for_id "
-           + "JOIN itens_entrada ie ON ne.notae_id = ie.notae_id "
-           + "JOIN produtos p ON ie.prod_id = p.prod_id "
-           + "ORDER BY ne.notae_id DESC";
-
-        try (Connection conexao = ConexaoSQL.getConexaoSQL();
-             PreparedStatement stmt = conexao.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            SimpleDateFormat formatoData = new SimpleDateFormat("dd/MM/yyyy");
-
-            while (rs.next()) {
-                int fornecedorId = rs.getInt("for_id");
-                String data = formatoData.format(rs.getDate("for_data"));
-                String fornecedor = rs.getString("for_nome");
-                String produto = rs.getString("prod_nome");
-                double preco = rs.getDouble("preco");
-                int quantidade = rs.getInt("quantidade");
-                double subtotal = preco * quantidade;
-
-                modelo.addRow(new Object[]{
-                    fornecedorId,
-                    data,
-                    fornecedor,
-                    produto,
-                    preco,      
-                    quantidade,
-                    subtotal    
-});
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        // Pega a lista de clientes cadastrados
+        List<Fornecedor> listaFornecedores = CadastroFor.getFornecedores();
+        
+        // Adiciona cada cliente como uma linha na tabela
+        for (Fornecedor f : listaFornecedores) {
+            modelo.addRow(new Object[]{
+                f.getId(),        // id do cliente
+                f.getNome(),      // nome
+                f.getNomefant(),  // nome fantasia
+                f.getCNPJ(),      // cnpj
+                f.getCep(),       // cep
+                f.getNum(),       // número
+                f.getEmail(),     // email
+                f.getTel()        // telefone
+            });
         }
     }
 
@@ -82,17 +61,17 @@ public class TabelaFornecedores extends javax.swing.JFrame {
 
         tabelaFor.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Id", "Nome", "Nome F", "CEP", "Número", "Email", "Telefone"
+                "Id", "Nome", "Nome F", "CNPJ", "CEP", "Número", "Email", "Telefone"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -118,7 +97,7 @@ public class TabelaFornecedores extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 26)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\pczinho\\Downloads\\JAVAprojeto\\JAVAprojeto\\src\\icons\\icone_fornecedor.png")); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\2830482411041\\Downloads\\Javaprojeto\\SistemadeCompraseVendas\\src\\icons\\icone_fornecedor.png")); // NOI18N
         jLabel1.setText("Fornecedores Cadastrados");
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jLabel1.setIconTextGap(8);
@@ -144,7 +123,7 @@ public class TabelaFornecedores extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 801, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 819, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

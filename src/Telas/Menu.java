@@ -73,7 +73,7 @@ public class Menu extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setIcon(new javax.swing.ImageIcon("C:\\Users\\pczinho\\Downloads\\JAVAprojeto\\JAVAprojeto\\src\\icons\\icone_empresa.png")); // NOI18N
+        jLabel6.setIcon(new javax.swing.ImageIcon("C:\\Users\\2830482411041\\Downloads\\Javaprojeto\\SistemadeCompraseVendas\\src\\icons\\icone_empresa.png")); // NOI18N
         jLabel6.setText("Sistema de Gestão");
         jLabel6.setToolTipText("");
 
@@ -82,9 +82,9 @@ public class Menu extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(88, Short.MAX_VALUE)
+                .addContainerGap(96, Short.MAX_VALUE)
                 .addComponent(jLabel6)
-                .addContainerGap(89, Short.MAX_VALUE))
+                .addContainerGap(96, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,7 +135,7 @@ public class Menu extends javax.swing.JFrame {
         prodCButton.setText("<html><center>📦<br><br><b>Produtos</b><br><small>Gerenciar produtos</small></center></html>");
         prodCButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(51, 51, 51), 2, true));
         prodCButton.setBorderPainted(false);
-        prodCButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        prodCButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         prodCButton.setFocusPainted(false);
         prodCButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         prodCButton.setIconTextGap(8);
@@ -154,7 +154,7 @@ public class Menu extends javax.swing.JFrame {
         forCButton.setText("<html><center>🏭<br><br><b>Fornecedores</b><br><small>Gerenciar fornecedores</small></center></html>");
         forCButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(229, 231, 235), 2, true));
         forCButton.setBorderPainted(false);
-        forCButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        forCButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         forCButton.setFocusPainted(false);
         forCButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         forCButton.setPreferredSize(new java.awt.Dimension(111, 140));
@@ -172,7 +172,7 @@ public class Menu extends javax.swing.JFrame {
         clCButton.setText("<html><center>👥<br><br><b>Clientes</b><br><small>Gerenciar clientes</small></center></html>");
         clCButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(229, 231, 235), 2, true));
         clCButton.setBorderPainted(false);
-        clCButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        clCButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         clCButton.setFocusPainted(false);
         clCButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         clCButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -207,7 +207,7 @@ public class Menu extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel7.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jPanel7.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel7.setOpaque(false);
         jPanel7.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
 
@@ -232,7 +232,7 @@ public class Menu extends javax.swing.JFrame {
         notasCButton1.setForeground(new java.awt.Color(255, 255, 255));
         notasCButton1.setText("<html><center>📤<br><br><b>Saída</b><br><small>Notas de saída</small></center></html>");
         notasCButton1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(229, 231, 235), 2, true));
-        notasCButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        notasCButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         notasCButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         notasCButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         notasCButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -247,7 +247,7 @@ public class Menu extends javax.swing.JFrame {
         exitButton.setForeground(new java.awt.Color(255, 255, 255));
         exitButton.setText("Sair do Sistema");
         exitButton.setBorderPainted(false);
-        exitButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        exitButton.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         exitButton.setFocusPainted(false);
         exitButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

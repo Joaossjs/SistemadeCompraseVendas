@@ -1,6 +1,0 @@
-Transformar as em todas as tabelas
-corrigir o erro de 'prod_id' doesn't have a default value na tela NotasEn
-
-Terminar a tela NotasSa, tentando corrigir o mesmo erro da NotasEn
-
-NotasEn deve apenas verificar se a tabela de produtos tem algo adicionado, se sim, cria a nota com Id, Fornecedor, Produto etc.

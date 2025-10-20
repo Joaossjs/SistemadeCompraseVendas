@@ -44,7 +44,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel1" pref="768" max="32767" attributes="0"/>
+          <Component id="jPanel1" pref="777" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="112" max="-2" attributes="0"/>
               <Component id="jPanel2" max="32767" attributes="0"/>
@@ -109,7 +109,7 @@
             </Property>
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\pczinho\Downloads\JAVAprojeto\JAVAprojeto\src\icons\icone_fornecedor.png"/>
+              <Image iconType="2" name="C:\Users\2830482411041\Downloads\Javaprojeto\SistemadeCompraseVendas\src\icons\icone_fornecedor.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Cadastro de Fornecedores"/>
             <Property name="horizontalTextPosition" type="int" value="4"/>

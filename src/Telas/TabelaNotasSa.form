@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
   </Properties>
@@ -94,7 +94,7 @@
             </Property>
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\pczinho\Downloads\JAVAprojeto\JAVAprojeto\src\icons\icone_saida.png"/>
+              <Image iconType="2" name="C:\Users\2830482411041\Downloads\Javaprojeto\SistemadeCompraseVendas\src\icons\icone_saida.png"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Lan&#xe7;amento de Notas de Sa&#xed;da"/>
           </Properties>

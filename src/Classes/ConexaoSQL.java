@@ -8,7 +8,7 @@ public class ConexaoSQL {
     
     private static final String URL      = "jdbc:mysql://127.0.0.1:3306/sistema_gestao?useTimezone=true&serverTimezone=UTC";
     private static final String USUARIO  = "root";
-    private static final String SENHA = "1234"; 
+    private static final String SENHA = "root"; 
 
     public static Connection getConexaoSQL() {
         try {

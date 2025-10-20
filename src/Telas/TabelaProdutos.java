@@ -88,7 +88,7 @@ public class TabelaProdutos extends javax.swing.JFrame {
         returnProdbTn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         returnProdbTn.setForeground(new java.awt.Color(255, 255, 255));
         returnProdbTn.setText("Voltar");
-        returnProdbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        returnProdbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         returnProdbTn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 returnProdbTnActionPerformed(evt);
@@ -101,7 +101,7 @@ public class TabelaProdutos extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setIcon(new javax.swing.ImageIcon("C:\\Users\\pczinho\\Downloads\\JAVAprojeto\\JAVAprojeto\\src\\icons\\icone_caixa.png")); // NOI18N
+        jLabel7.setIcon(new javax.swing.ImageIcon("C:\\Users\\2830482411041\\Downloads\\Javaprojeto\\SistemadeCompraseVendas\\src\\icons\\icone_caixa.png")); // NOI18N
         jLabel7.setText("Produtos Cadastrados");
         jLabel7.setToolTipText("");
         jLabel7.setIconTextGap(10);
@@ -135,7 +135,7 @@ public class TabelaProdutos extends javax.swing.JFrame {
                         .addComponent(returnProdbTn, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 823, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

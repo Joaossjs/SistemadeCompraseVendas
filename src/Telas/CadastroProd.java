@@ -74,7 +74,7 @@ public class CadastroProd extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setIcon(new javax.swing.ImageIcon("C:\\Users\\pczinho\\Downloads\\JAVAprojeto\\JAVAprojeto\\src\\icons\\icone_caixa.png")); // NOI18N
+        jLabel7.setIcon(new javax.swing.ImageIcon("C:\\Users\\2830482411041\\Downloads\\Javaprojeto\\SistemadeCompraseVendas\\src\\icons\\icone_caixa.png")); // NOI18N
         jLabel7.setText("Cadastro de Produtos");
         jLabel7.setToolTipText("");
         jLabel7.setIconTextGap(10);
@@ -96,7 +96,7 @@ public class CadastroProd extends javax.swing.JFrame {
                 .addContainerGap(26, Short.MAX_VALUE))
         );
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15), "", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), new java.awt.Color(240, 244, 248))); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15), "", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 16), new java.awt.Color(240, 244, 248))); // NOI18N
 
         jLabel2.setBackground(new java.awt.Color(51, 51, 51));
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
@@ -142,7 +142,7 @@ public class CadastroProd extends javax.swing.JFrame {
         returnbTnprod.setForeground(new java.awt.Color(255, 255, 255));
         returnbTnprod.setText("Voltar");
         returnbTnprod.setBorderPainted(false);
-        returnbTnprod.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        returnbTnprod.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         returnbTnprod.setFocusPainted(false);
         returnbTnprod.setPreferredSize(new java.awt.Dimension(50, 40));
         returnbTnprod.addActionListener(new java.awt.event.ActionListener() {
@@ -156,7 +156,7 @@ public class CadastroProd extends javax.swing.JFrame {
         saveprodbTn.setForeground(new java.awt.Color(255, 255, 255));
         saveprodbTn.setText("Salvar Produto");
         saveprodbTn.setBorderPainted(false);
-        saveprodbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        saveprodbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         saveprodbTn.setFocusPainted(false);
         saveprodbTn.setPreferredSize(new java.awt.Dimension(94, 40));
         saveprodbTn.addActionListener(new java.awt.event.ActionListener() {
@@ -170,7 +170,7 @@ public class CadastroProd extends javax.swing.JFrame {
         clearprodbTn.setForeground(new java.awt.Color(255, 255, 255));
         clearprodbTn.setText("Limpar");
         clearprodbTn.setBorderPainted(false);
-        clearprodbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        clearprodbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         clearprodbTn.setFocusPainted(false);
         clearprodbTn.setPreferredSize(new java.awt.Dimension(50, 40));
         clearprodbTn.addActionListener(new java.awt.event.ActionListener() {
@@ -184,7 +184,7 @@ public class CadastroProd extends javax.swing.JFrame {
         prodscadbTn.setForeground(new java.awt.Color(255, 255, 255));
         prodscadbTn.setText("Produtos Cadastrados");
         prodscadbTn.setBorderPainted(false);
-        prodscadbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        prodscadbTn.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         prodscadbTn.setFocusPainted(false);
         prodscadbTn.setPreferredSize(new java.awt.Dimension(131, 40));
         prodscadbTn.addActionListener(new java.awt.event.ActionListener() {
@@ -251,7 +251,7 @@ public class CadastroProd extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 418, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
